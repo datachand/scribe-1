@@ -15,6 +15,8 @@
     #define SCRIBE_DEBUG 0
 #endif
 
+#define SCRIBE_RWLOCK_DELAY 50
+
 // OS specific configuration
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 #   define SCRIBE_WINDOWS

@@ -15,29 +15,6 @@
 
 #include "scribe_format.h"
 
-enum scrb_format_type {
-    FMT_UNKOWN = -1,
-    FMT_FILE,
-    FMT_MTHD,
-    FMT_LINE,
-    FMT_PID,
-    FMT_TIME,
-    FMT_MSG
-};
-
-struct split_form {
-    enum scrb_format_type const type;
-    char const * const string;
-    uint64_t const len;
-};
-
-struct scrb_format {
-    char const * const fmtstr;
-    uint64_t const fmtstr_len;
-    struct split_form const * const fmtstr_split;
-    uint64_t const nsplits;
-};
-
 static inline
 struct split_form parse_formatter(char const * const startpoint, uint64_t const maxlen)
 {
@@ -85,14 +62,14 @@ struct split_form parse_formatter(char const * const startpoint, uint64_t const 
                     goto error;
                 }
             }
-            splitpos = startpoint + i + 2; // skip over formatter.
+            splitpos = startpoint + i;
             break;
         } 
     }
 
-    while (i < maxlen - 1 && startpoint[i] != '%') { i += 1; len += 1; }
+    do { i += 1; len += 1; } while (i < maxlen && startpoint[i] != '%'); 
 
-    return (struct split_form) { .type = type, .string = len != 0 ? strndup(splitpos, len) : NULL, .len = len };
+    return (struct split_form) { .type = type, .string = strndup(splitpos, len), .len = len };
 error:
     return (struct split_form) { .type = type, .string = NULL, .len = 0 };
 }
@@ -106,6 +83,7 @@ scrb_format * scrb_create_format__internal(char const * const fmtstr)
     struct {
         char const * fmtstr;
         uint64_t fmtstr_len;
+        char const * fmtleader;
         struct split_form * fmtstr_split_forms;
         uint64_t nsplits;
     } tmp;
@@ -119,21 +97,27 @@ scrb_format * scrb_create_format__internal(char const * const fmtstr)
     struct split_form tmp_split_forms[(tmp.fmtstr_len / 2) + 1];
 
     char const * curpos = tmp.fmtstr;
-    uint64_t l = tmp.fmtstr_len;
-    uint64_t i;
-    for (i = 0; i < l; i += 1) {
-        struct split_form parsed = parse_formatter(curpos, l - i);
+    uint64_t fmtlen = tmp.fmtstr_len;
+    uint64_t totlen = 0;
+    
+    while (*curpos != '%' && totlen < fmtlen) { curpos += 1; totlen += 1; }
+    tmp.fmtleader = strndup(tmp.fmtstr, totlen);
+
+    do {
+        struct split_form parsed = parse_formatter(curpos, fmtlen - totlen);
         if (FMT_UNKOWN == parsed.type) {
 #ifdef SCRIBE_DEBUG
-            fprintf(stderr, "unkown format identifier");
+            fprintf(stderr, "unkown format identifier\n");
 #endif
-            goto error;
-        } else {
-            tmp_split_forms[tmp.nsplits] = parsed;
-            tmp.nsplits += 1;
+            free((void *)tmp.fmtstr);
+            goto error;            
         }
-    }
-
+        tmp_split_forms[tmp.nsplits] = parsed;
+        tmp.nsplits += 1;
+        curpos += parsed.len;
+        totlen += parsed.len;
+    } while(totlen < fmtlen);
+    
     // now allocate for actual tmp split forms
     tmp.fmtstr_split_forms = malloc(tmp.nsplits * sizeof(struct split_form));
     memcpy(tmp.fmtstr_split_forms, tmp_split_forms, tmp.nsplits * sizeof(struct split_form));
@@ -146,12 +130,18 @@ error:
     return NULL;
 }
 
-void scrb_format_release__internal(struct scrb_format ** fmtptr)
+void scrb_format_release__internal(scrb_format ** fmtptr)
 {
     if (NULL != fmtptr && NULL != *fmtptr) {
-        free((void *)(*fmtptr)->fmtstr);
-        free((void *)(*fmtptr)->fmtstr_split);
-        free(*fmtptr);     
+        scrb_format * fmt = *fmtptr;
+        free((void *)fmt->fmtstr);
+        free((void *)fmt->fmtleader);
+        uint64_t i;
+        for (i = 0; i < fmt->nsplits; i += 1) {
+            free((void *)fmt->fmtstr_split[i].string);
+        }
+        free((void *)fmt->fmtstr_split);
+        free(fmt);
     }
 }
 

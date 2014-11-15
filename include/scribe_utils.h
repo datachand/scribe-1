@@ -11,6 +11,7 @@
 
 #include "scribe_conf.h"
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #ifdef SCRIBE_WINDOWS
@@ -30,7 +31,7 @@ struct scrb_meta_info {
     SCRIBE_TIME_T ts;
 };
 
-extern inline
+static inline
 SCRIBE_TIME_T scrb_gettime(void)
 {
 #if defined(SCRIBE_WINDOWS)
@@ -46,7 +47,7 @@ SCRIBE_TIME_T scrb_gettime(void)
     return ts;
 }
 
-extern inline
+static inline
 SCRIBE_PID_T scrb_getpid(void)
 {
 #ifdef SCRIBE_WINDOWS
@@ -56,9 +57,13 @@ SCRIBE_PID_T scrb_getpid(void)
 #endif
 }
 
-#define get_meta_info() (struct scribe_meta_info)                               \
+#define get_meta_info() (struct scrb_meta_info)                                 \
                     { .file = __FILE__, .mthd = __FUNCTION__, .line = __LINE__, \
-                      .pid = scribe_getpid(), .ts = scrb_gettime() }
+                      .pid = scrb_getpid(), .ts = scrb_gettime() }
+
+extern
+char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const fmt,
+                      char const * const msg, bool const newline);
 
 #endif
 

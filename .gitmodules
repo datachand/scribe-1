@@ -1,0 +1,3 @@
+[submodule "submodules/spinlock"]
+	path = submodules/spinlock
+	url = https://github.com/daltonwoodard/spinlock.git

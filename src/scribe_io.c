@@ -18,22 +18,22 @@
 #include "spinlock.h"
 
 int scrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * const st,
-			             struct scrb_format const * const fmt, char const * const msg)
+			             struct scrb_format const * const fmt, char const * const msg, bool const newline)
 {
-	char const * const wrt = scrb_build_msg(mi, fmt, msg);
+	char const * wrt = scrb_build_msg(mi, fmt, msg, newline);
     if (NULL == wrt) {
 #ifdef SCRIBE_DEBUG
-        fprintf(stderr, "Failed to build log message.");
+        fprintf(stderr, "Failed to build log message.\n");
 #endif
         goto error;
     } else {
         if (st->synchronize) {
-            thread_lock_acquire(st->rwlock);
+            thread_lock_acquire((spinlock_t *)&st->rwlock);
         }
-        fputs(st->filestream, wrt);
-        free(wrt);
+        fputs(wrt, st->filestream);
+        free((void *)wrt);
         if (st->synchronize) {
-            thread_lock_release(st->rwlock);
+            thread_lock_release((spinlock_t *)&st->rwlock);
         }
     }
 	return (SCRIBE_Success);
@@ -42,32 +42,33 @@ error:
 }
 
 int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * const st,
-                          struct scrb_format const * const fmt, char const * const msgfmt, va_list ap)
+                          struct scrb_format const * const fmt, char const * const msgfmt, 
+                          bool const newline, va_list ap)
 {
 	char * msg;
 	vasprintf(&msg, msgfmt, ap);
 
 	if (NULL == msg) {
 #if SCRIBE_DEBUG
-		fprintf(stderr, "Failed to create log message.");
+		fprintf(stderr, "Failed to create log message.\n");
 #endif
 		errno = ENOMEM;
 		goto error;
 	}
 
-	char const * const wrt = scrb_build_msg(mi, fmt, msg);
+	char const * wrt = scrb_build_msg(mi, fmt, msg, newline);
     if (NULL == wrt) {
 #ifdef SCRIBE_DEBUG
-        fprintf(stderr, "Failed to build log message.");
+        fprintf(stderr, "Failed to build log message.\n");
 #endif
     } else {
         if (st->synchronize) {
-            thread_lock_acquire(st->rwlock);
+            thread_lock_acquire((spinlock_t *)&st->rwlock);
         }
-        fputs(st->filestream, wrt);
-        free(wrt);
+        fputs(wrt, st->filestream);
+        free((void *)wrt);
         if (st->synchronize) {
-            thread_lock_release(st->rwlock);
+            thread_lock_release((spinlock_t *)&st->rwlock);
         }
     }
 	return (SCRIBE_Success);

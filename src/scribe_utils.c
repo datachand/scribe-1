@@ -40,10 +40,10 @@ int string_builder_write_str(struct string_builder * const b, char const * const
     }
  #ifdef SCRIBE_DEBUG
     if (NULL == b) {
-        fprintf(stderr, "NULL string_builder pointer.");
+        fprintf(stderr, "NULL string_builder pointer.\n");
         goto error;
     } else if (NULL == wstr) {
-        fprintf(stderr, "NULL string passed.");
+        fprintf(stderr, "NULL string passed.\n");
         goto error;
     }
 #endif
@@ -61,8 +61,8 @@ error:
     return (SCRIBE_Failure);
 }
 
-char * scrb_build_msg(struct scrb_meta_info const mi, struct scrb_format const * const fmt, 
-                      char const * const msg)
+char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const fmt,
+                      char const * const msg, bool const newline)
 {
     struct string_builder builder;
     builder.str = malloc(BUILDER_INIT_SIZE * sizeof(char));
@@ -71,14 +71,15 @@ char * scrb_build_msg(struct scrb_meta_info const mi, struct scrb_format const *
     
     if (NULL == builder.str) {
 #if SCRIBE_DEBUG
-        fprintf(stderr, "Failed to build message string.");
+        fprintf(stderr, "Failed to build message string.\n");
 #endif
         goto error;
     }
 
-    uint64_t const n = fmt->nsplits;
+    string_builder_write_str(&builder, fmt->fmtleader, strlen(fmt->fmtleader));
+
     uint64_t i;
-    for (i = 0; i < n; i += 1) {  
+    for (i = 0; i < fmt->nsplits; i += 1) {  
         switch (fmt->fmtstr_split[i].type) {
             case (FMT_FILE):
             {
@@ -147,8 +148,9 @@ char * scrb_build_msg(struct scrb_meta_info const mi, struct scrb_format const *
             }
             default: break;
         }
-        if (SCRIBE_Success != string_builder_write_str(&builder, fmt->fmtstr_split[i].str,
-                                                       fmt->fmtstr_split[i].len))
+        if (SCRIBE_Success != string_builder_write_str(&builder, 
+                                                       fmt->fmtstr_split[i].string + 2, 
+                                                       fmt->fmtstr_split[i].len - 2))
         {
             if (NULL != builder.str) {
                 free(builder.str);
@@ -157,6 +159,14 @@ char * scrb_build_msg(struct scrb_meta_info const mi, struct scrb_format const *
         }
     }
 
+    if (newline) {
+        if (SCRIBE_Success != string_builder_write_str(&builder, "\n", 1)) {
+            if (NULL != builder.str) {
+                free(builder.str);
+            }
+            goto error;
+        }
+    }
     char * ret = malloc((builder.len + 1) * sizeof(char));
     memcpy(ret, builder.str, builder.len);
     free(builder.str);

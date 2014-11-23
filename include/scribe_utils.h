@@ -46,9 +46,12 @@ SCRIBE_TIME_T scrb_gettime(void)
 #elif defined(SCRIBE_OSX) || !defined(_POSIX_TIMERS)
     struct timeval ts;
     gettimeofday(&ts, NULL);
-#else
+#elif defined(_POSIX_TIMERS)
     struct timespec ts;
     clock_gettime(CLOCK_REALTIME, &ts);
+#else
+    sturct timeval ts;
+    gettimeofday(&ts, NULL);
 #endif
     return ts;
 }

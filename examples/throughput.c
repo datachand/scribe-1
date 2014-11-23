@@ -31,10 +31,7 @@ int main(void)
     }
     
     for (uint64_t i = 0; i < REPEATS; i += 1) {
-        //fscrb_writeln(log, fmt, "This writes to the log file #%llu.", i); 
-        //scrb_writeln(log, fmt, "This writes to the log file.");
-        (void) scrb_gettime();
-        fprintf(log->stream.filestream, "(%d|%s|%s|%d) %s", (int) scrb_getpid(), __FILE__, __FUNCTION__, __LINE__, "This writes to the log file.\n");
+        scrb_writeln(log, fmt, "This writes to the log file.");
     }
 
     scrb_close_stream(&log);

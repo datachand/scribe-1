@@ -23,6 +23,8 @@
 #include <unistd.h>
 #endif
 
+#include "scribe_format.h"
+
 struct scrb_meta_info {
     char const * const file;
     char const * const mthd;
@@ -62,8 +64,8 @@ SCRIBE_PID_T scrb_getpid(void)
                       .pid = scrb_getpid(), .ts = scrb_gettime() }
 
 extern
-char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const fmt,
-                      char const * const msg, bool const newline);
+char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const fmt, char * const printbuff, 
+                      uint64_t const cap, char const * const msg, bool const newline);
 
 #endif
 

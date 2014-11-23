@@ -9,13 +9,21 @@
 #ifndef SCRIBE_CONF_H
 #define SCRIBE_CONF_H
 
+#define SCRIBE_VERSION_MAJOR "0"
+#define SCRIBE_VERSION_MINOR "0"
+#define SCRIBE_VERSION_PATCH "0"
+#define SCRIBE_VERSION ""SCRIBE_VERSION_MAJOR"."SCRIBE_VERSION_MINOR"."SCRIBE_VERSION_PATCH""
+
 #ifdef NDEBUG
-    #define SCRIBE_DEBUG 1
+#   define SCRIBE_DEBUG 0
 #else
-    #define SCRIBE_DEBUG 0
+#   define SCRIBE_DEBUG 1
 #endif
 
 #define SCRIBE_RWLOCK_DELAY 50
+
+#define likely(x) __builtin_expect((x),1)
+#define unlikely(x) __builtin_expect((x),0)
 
 // OS specific configuration
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)

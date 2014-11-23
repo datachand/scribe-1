@@ -13,164 +13,191 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "scribe_debug.h"
 #include "scribe_format.h"
 #include "scribe_types.h"
 #include "scribe_utils.h"
 
-#define BUILDER_INIT_SIZE 256
-
-struct string_builder {
-    char * str;
-    uint64_t len;
-    uint64_t cap;
-};
+#define BUILDER_INIT_SIZE 128
 
 static inline
-void string_builder_expand(struct string_builder * const b)
+char * reallocstr(char * str, bool const allocated, uint64_t const newcap)
 {
-    realloc(b->str, b->cap * 2);
-    b->cap *= 2;
+    return (allocated ? realloc(str, newcap * sizeof(char)) : malloc(newcap * sizeof(char)));
 }
 
-static
-int string_builder_write_str(struct string_builder * const b, char const * const wstr, uint64_t const wstrlen)
+char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const fmt, char * const printbuff, 
+                      uint64_t const cap, char const * const msg, bool const newline)
 {
-    if (0 == wstrlen) {
-        return (SCRIBE_Success);
-    }
- #ifdef SCRIBE_DEBUG
-    if (NULL == b) {
-        fprintf(stderr, "NULL string_builder pointer.\n");
-        goto error;
-    } else if (NULL == wstr) {
-        fprintf(stderr, "NULL string passed.\n");
-        goto error;
-    }
-#endif
-    while (b->len + wstrlen >= b->cap - 1) {
-        string_builder_expand(b);
-        if (NULL == b->str) {
-            goto error;
+    bool allocated = false;
+    char * wrtstr = printbuff;
+    char * wrtpos = wrtstr;
+    uint64_t wrtcap = cap;
+    char const * fmtstr = fmt->fmtstr;
+    uint64_t const numfmts = fmt->numfmts;
+
+    // we'll copy the format types into a static array to remove one level
+    // of pointer indirection to pass through during the loop below.
+    fmttype const fmttypes[numfmts];
+    memcpy((void *)fmttypes, fmt->fmttypes, numfmts * sizeof(fmttype));
+
+    uint64_t wrtlen = 0, fmtcount = 0;
+    while (*fmtstr != '\0') {  
+        // oops, looks like we've hit the write capacity,
+        // we'll allocate a new buffer and work from there.
+        if (unlikely(wrtlen == wrtcap)) {
+            wrtstr = reallocstr(wrtstr, allocated, 2 * wrtcap);
+            if (NULL == wrtstr) {
+                goto error;
+            }
+            if (!allocated) {
+                memcpy(wrtstr, printbuff, wrtlen);
+            }
+            allocated = true;
+            wrtcap *= 2;
+            wrtpos = wrtstr + wrtlen;
         }
-    }
-    
-    memcpy(b->str + b->len, wstr, wstrlen);
-    b->len += wstrlen;
-    return (SCRIBE_Success);
-error:
-    return (SCRIBE_Failure);
-}
 
-char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const fmt,
-                      char const * const msg, bool const newline)
-{
-    struct string_builder builder;
-    builder.str = malloc(BUILDER_INIT_SIZE * sizeof(char));
-    builder.len = 0;
-    builder.cap = BUILDER_INIT_SIZE;
-    
-    if (NULL == builder.str) {
-#if SCRIBE_DEBUG
-        fprintf(stderr, "Failed to build message string.\n");
-#endif
-        goto error;
-    }
-
-    string_builder_write_str(&builder, fmt->fmtleader, strlen(fmt->fmtleader));
-
-    uint64_t i;
-    for (i = 0; i < fmt->nsplits; i += 1) {  
-        switch (fmt->fmtstr_split[i].type) {
-            case (FMT_FILE):
-            {
-                if (SCRIBE_Success != string_builder_write_str(&builder, mi.file, strlen(mi.file))) {
-                    if (NULL != builder.str) {
-                        free(builder.str);
-                    }
-                    goto error;
+        if (*fmtstr != '%') {
+            *wrtpos = *fmtstr;
+            fmtstr += 1;
+            wrtpos += 1;
+            wrtlen += 1;
+        } else {
+            uint64_t addlen = 0;
+            switch (fmttypes[fmtcount++]) {
+                case (FMT_FILE):
+                {
+                    addlen = strlen(mi.file);
+                    if (unlikely(wrtlen + addlen >= wrtcap)) {
+                        wrtstr = reallocstr(wrtstr, allocated, 2 * wrtcap);
+                        if (NULL == wrtstr) {
+                            goto error;
+                        }
+                        if (!allocated) {
+                            memcpy(wrtstr, printbuff, wrtlen);
+                        }
+                        allocated = true;
+                        wrtcap *= 2;
+                        wrtpos = wrtstr + wrtlen;
+                    } 
+                    memcpy(wrtpos, mi.file, addlen);
+                    break;
                 }
-                break;
-            }
-            case (FMT_MTHD):
-            {
-                if (SCRIBE_Success != string_builder_write_str(&builder, mi.mthd, strlen(mi.mthd))) {
-                    if (NULL != builder.str) {
-                        free(builder.str);
-                    }
-                    goto error;
+                case (FMT_MTHD):
+                {
+                    addlen = strlen(mi.mthd);
+                    if (unlikely(wrtlen + addlen >= wrtcap)) {
+                        wrtstr = reallocstr(wrtstr, allocated, 2 * wrtcap);
+                        if (NULL == wrtstr) {
+                            goto error;
+                        }
+                        if (!allocated) {
+                            memcpy(wrtstr, printbuff, wrtlen);
+                        }
+                        allocated = true;
+                        wrtcap *= 2;
+                        wrtpos = wrtstr + wrtlen;
+                    } 
+                    memcpy(wrtpos, mi.mthd, addlen);
+                    break;
                 }
-                break;
-            }
-            case (FMT_LINE):
-            {
-                char ls[20];
-                uint64_t const len = snprintf(ls, 20, "%d", mi.line);
-                if (SCRIBE_Success != string_builder_write_str(&builder, ls, len)) {
-                    if (NULL != builder.str) {
-                        free(builder.str);
-                    }
-                    goto error;
+                case (FMT_LINE):
+                {
+                    char numstr[20];
+                    addlen = snprintf(numstr, 20, "%d", mi.line);
+                    if (unlikely(wrtlen + addlen >= wrtcap)) {
+                        wrtstr = reallocstr(wrtstr, allocated, 2 * wrtcap);
+                        if (NULL == wrtstr) {
+                            goto error;
+                        }
+                        if (!allocated) {
+                            memcpy(wrtstr, printbuff, wrtlen);
+                        }
+                        allocated = true;
+                        wrtcap *= 2;
+                        wrtpos = wrtstr + wrtlen;
+                    } 
+                    memcpy(wrtpos, numstr, addlen);
+                    break;
                 }
-                break;
-            }
-            case (FMT_PID):
-            {
-                char ls[20];
-                uint64_t const len = snprintf(ls, 20, "%d", (int) mi.pid);
-                if (SCRIBE_Success != string_builder_write_str(&builder, ls, len)) {
-                    if (NULL != builder.str) {
-                        free(builder.str);
-                    }
-                    goto error;
+                case (FMT_PID):
+                {
+                    char numstr[20];
+                    addlen = snprintf(numstr, 20, "%d", (int) mi.pid);
+                    if (unlikely(wrtlen + addlen >= wrtcap)) {
+                        wrtstr = reallocstr(wrtstr, allocated, 2 * wrtcap);
+                        if (NULL == wrtstr) {
+                            goto error;
+                        }
+                        if (!allocated) {
+                            memcpy(wrtstr, printbuff, wrtlen);
+                        }
+                        allocated = true;
+                        wrtcap *= 2;
+                        wrtpos = wrtstr + wrtlen;
+                    } 
+                    memcpy(wrtpos, numstr, addlen);
+                    break;
                 }
-                break;
-            }
-            case (FMT_TIME):
-            {
                 // TODO: incorporate some sort of time formatting option
-                if (SCRIBE_Success != string_builder_write_str(&builder, "notime", strlen("notime"))) {
-                    if (NULL != builder.str) {
-                        free(builder.str);
+                /*
+                case (FMT_TIME):
+                {
+                    if (SCRIBE_Success != string_builder_write_str(&builder, "notime", strlen("notime"))) {
+                        if (NULL != builder.str) {
+                            free(builder.str);
+                        }
+                        goto error;
                     }
-                    goto error;
+                    break;
                 }
-                break;
-            }
-            case (FMT_MSG):
-            {
-                if (SCRIBE_Success != string_builder_write_str(&builder, msg, strlen(msg))) {
-                    if (NULL != builder.str) {
-                        free(builder.str);
-                    }
-                    goto error;
+                */
+                case (FMT_MSG):
+                {
+                    addlen = strlen(msg);
+                    if (unlikely(wrtlen + addlen >= wrtcap)) {
+                        wrtstr = reallocstr(wrtstr, allocated, 2 * wrtcap);
+                        if (NULL == wrtstr) {
+                            goto error;
+                        }
+                        if (!allocated) {
+                            memcpy(wrtstr, printbuff, wrtlen);
+                        }
+                        allocated = true;
+                        wrtcap *= 2;
+                        wrtpos = wrtstr + wrtlen;
+                    } 
+                    memcpy(wrtpos, msg, addlen);
+                    break;
                 }
-                break;
+                default:
+                    break;
             }
-            default: break;
-        }
-        if (SCRIBE_Success != string_builder_write_str(&builder, 
-                                                       fmt->fmtstr_split[i].string + 2, 
-                                                       fmt->fmtstr_split[i].len - 2))
-        {
-            if (NULL != builder.str) {
-                free(builder.str);
-            }
-            goto error;    
+            wrtlen += addlen;
+            wrtpos += addlen;
+            fmtstr += 2;        // skips over format identifier, as we don't want to print it.
         }
     }
 
     if (newline) {
-        if (SCRIBE_Success != string_builder_write_str(&builder, "\n", 1)) {
-            if (NULL != builder.str) {
-                free(builder.str);
+        if (unlikely(wrtlen >= wrtcap - 1)) {
+            wrtstr = reallocstr(wrtstr, allocated, 2 * wrtcap);
+            if (NULL == wrtstr) {
+                goto error; 
             }
-            goto error;
+            if (!allocated) {
+                memcpy(wrtstr, printbuff, wrtlen);
+            }
+            wrtpos = wrtstr + wrtlen;
         }
+        *wrtpos = '\n';
+        wrtpos += 1;
+        wrtlen += 1; 
     }
-    char * ret = malloc((builder.len + 1) * sizeof(char));
-    memcpy(ret, builder.str, builder.len);
-    free(builder.str);
-    return ret;
+
+    *wrtpos = '\0'; // clean off the end of the buffer before it's written to the output stream
+    return wrtstr;
 error:
     return NULL;
 }

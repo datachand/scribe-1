@@ -14,28 +14,29 @@
 
 #include "scribe_conf.h"
 
-enum scrb_format_type {
+typedef enum {
     FMT_UNKOWN = -1,
-    FMT_FILE,
-    FMT_MTHD,
-    FMT_LINE,
-    FMT_PID,
-    FMT_TIME,
-    FMT_MSG
-};
+    FMT_ID = 0,
+    FMT_FILE = 1,
+    FMT_MTHD = 2,
+    FMT_LINE = 3,
+    FMT_PID = 4,
+    FMT_TIME = 5,
+    FMT_STREMNAME = 6,
+    FMT_MSG = 7,
+    FMT_PRCNT = 8
+} fmttype;
 
-struct split_form {
-    enum scrb_format_type const type;
-    char const * const string;
-    uint64_t const len;
-};
+static
+char const fmtflags[] = { 'i', 'F', 'M', 'L', 'p', 't', 'n', 'm', '%' };
+
+static
+uint64_t const num_fmtflags = sizeof(fmtflags) / sizeof(fmtflags[0]);
 
 struct scrb_format {
-    char const * const fmtstr;
-    uint64_t const fmtstr_len;
-    char const * const fmtleader;
-    struct split_form const * const fmtstr_split;
-    uint64_t const nsplits;
+    char const * fmtstr;
+    fmttype const * fmttypes;
+    uint64_t numfmts;
 };
 
 typedef struct scrb_format scrb_format;

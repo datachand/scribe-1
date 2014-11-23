@@ -9,6 +9,7 @@ include_dir=$(base)/include
 object_dir=$(base)/obj
 build_dir=$(base)/build
 test_dir=$(base)/test
+examples_dir=$(base)/examples
 
 sources=$(wildcard $(source_dir)/*.c)
 objects=$(patsubst $(source_dir)%, $(object_dir)/%, $(sources:.c=.o))
@@ -17,15 +18,16 @@ target=$(build_dir)/libscribe.a
 
 CC?=clang
 std=c11
-opt_flags=-O2
-cflags=-std=$(std) $(opt_flags) -Werror -Wall -Wextra -Wformat=2 -Wshadow \
+o_flags?=-O2
+dgb_flags?=-g0
+cflags=-std=$(std) $(o_flags) $(dbg_flags) $(OPTFLAGS) -Werror -Wall -Wextra -Wformat=2 -Wshadow \
 	   -Wwrite-strings -Wstrict-prototypes -Wold-style-definition -Wredundant-decls \
 	   -Wnested-externs -Wmissing-include-dirs -Wcast-align -Wmissing-include-dirs \
 	   -Wswitch-default -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments \
 	   -Wno-format-nonliteral
 iflags=-I$(include_dir) -I$(submodules_dir)/spinlock/include
 
-.PHONY: all update setup build test clean
+.PHONY: all update setup build test examples clean
 
 all: test
 
@@ -47,7 +49,11 @@ build: setup $(objects) $(target)
 test: build
 	@make -C $(test_dir)
 
+examples: build
+	@make -C $(examples_dir)
+
 clean:
-	@rm -rf $(object_dir) $(build_dir) *.dSYM *.DS_Store
+	@rm -rf $(object_dir) $(build_dir) *.log *.dSYM *.DS_Store
 	@make -C $(test_dir) clean
+	@make -C $(examples_dir) clean
 

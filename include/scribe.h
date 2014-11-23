@@ -21,12 +21,21 @@
 #include "scribe_types.h"
 #include "scribe_format.h"
 #include "scribe_utils.h"
+#include "spinlock.h"
 
+static
 scrb_stream const * const scrb_stdout = &stream_out_default;
 
+static
 scrb_stream const * const scrb_stdin = &stream_in_default;
 
+static
 scrb_stream const * const scrb_stderr = &stream_err_default;
+
+#if SCRIBE_DEBUG
+static
+scrb_stream const * const scrb_debug = &scrb_dbg_default;
+#endif
 
 // `scrb_init`
 // doc...
@@ -35,32 +44,63 @@ int scrb_init(void)
 {
     scrb_stream const outstream = (scrb_stream) {
 	    .name = "stdout",
-	    .filestream = stdout,
 	    .readable = false,
 	    .writeable = true,
 	    .synchronize = true,
+        .memmap = false,
+        .stream = {
+            .filestream = stdout
+        },
 	    .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
     };
 
     scrb_stream const instream = (scrb_stream) {
 	    .name = "stdin",
-	    .filestream = stdin,
 	    .readable = true,
 	    .writeable = false,
 	    .synchronize = true,
+        .memmap = false,
+        .stream = {
+            .filestream = stdin
+        },
         .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
     };
 
     scrb_stream const errstream = (scrb_stream) {
 	    .name = "stderr",
-	    .filestream = stderr,
 	    .readable = false,
 	    .writeable = true,
 	    .synchronize = true,
+        .memmap = false,
+        .stream = {
+            .filestream = stderr
+        },
         .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY) 
     };
 
+#if SCRIBE_DEBUG
+    scrb_stream const dbgstream = (scrb_stream) {
+        .name = "debug",
+        .readable = false,
+        .writeable = true,
+        .synchronize = true,
+        .memmap = false,
+        .stream = {
+            .filestream = fopen("scribedebug.log", "a")
+        },
+        .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
+    };
+
+    if (NULL == dbgstream.stream.filestream) {
+        return (SCRIBE_Failure);
+    }
+
+    scrb_init_defaults(&outstream, &instream, &errstream, &dbgstream);
+    fprintf(dbgstream.stream.filestream, "----- scribe init :: version (%s) :: compiled (%s %s) :: pid (%d) -----\n",
+            SCRIBE_VERSION, __DATE__, __TIME__, (int) scrb_getpid());
+#else
     scrb_init_defaults(&outstream, &instream, &errstream);
+#endif
     return (SCRIBE_Success);
 }
 
@@ -92,9 +132,10 @@ char const * scrb_stream_name(scrb_stream const * const st)
 // `scribe_open_file`
 // doc...
 static inline
-scrb_stream * scrb_open_stream(char const * const path, char const * const mode, bool const synchronize)
+scrb_stream * scrb_open_stream(char const * const path, char const * const mode,
+                               bool const synchronize, bool const memmap)
 {
-    return scrb_open_stream__internal(path, mode, synchronize);
+    return scrb_open_stream__internal(path, mode, synchronize, memmap);
 }
 
 // `scribe_close`
@@ -109,17 +150,17 @@ void (scrb_close_stream)(scrb_stream ** streamptr)
 // `scribe_flush_stream`
 // doc...
 static inline
-int scrb_flush_stream(scrb_stream * const st)
+void scrb_flush_stream(scrb_stream * const st)
 {
-    return scrb_flush_stream__internal(st);
+    scrb_flush_stream__internal(st);
 }
 
 // `scribe_purge_stream`
 // doc...
 static inline
-int scrb_purge_stream(scrb_stream * const st)
+void scrb_purge_stream(scrb_stream * const st)
 {
-    return scrb_purge_stream__internal(st);
+    scrb_purge_stream__internal(st);
 }
 
 // `scribe_write`
@@ -128,7 +169,7 @@ static inline
 int (scrb_write)(struct scrb_meta_info const mi, scrb_stream const * const st, 
                  struct scrb_format const * const fmt, char const * const msg)
 {
-    return scrb_write__internal(mi, st, fmt, false, msg); 
+    return scrb_write__internal(mi, st, fmt, msg, false); 
 }
 #define scrb_write(st, fmt, msg) (scrb_write)(get_meta_info(), (st), (fmt), (msg))
 

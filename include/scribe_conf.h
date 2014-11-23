@@ -36,7 +36,7 @@
 #elif defined(linux) || defined(__linux__) || defined(__linux)
 #   define SCRIBE_LINUX
 #elif !(defined(__gnuc__) || defined(__GNUC__))
-#   error Unknown OS, can't decide which types to use!
+#   error "Unknown OS, can\'t decide which types to use!"
 #endif
 
 #if defined(SCRIBE_WINDOWS)

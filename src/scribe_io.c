@@ -8,6 +8,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <sys/mman.h>
 

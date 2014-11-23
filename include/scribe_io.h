@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 #include <stdarg.h>
+#include <stdbool.h>
 
 #include "scribe.h"
 #include "scribe_conf.h"

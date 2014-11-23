@@ -5,6 +5,7 @@ A fast logging library for C. Note, this project is nowhere near complete and mo
 the moment.
 
 Author: Dalton Woodard
+
 Contact: daltonmwoodard@gmail.com
 
 ## License

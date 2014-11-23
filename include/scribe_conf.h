@@ -35,7 +35,7 @@
 #   define SCRIBE_UNIX
 #elif defined(linux) || defined(__linux__) || defined(__linux)
 #   define SCRIBE_LINUX
-#else
+#elif !(defined(__gnuc__) || defined(__GNUC__))
 #   error Unknown OS, can't decide which types to use!
 #endif
 
@@ -45,7 +45,7 @@
 #elif defined(SCRIBE_OSX)
 #   define SCRIBE_TIME_T struct timeval
 #   define SCRIBE_PID_T pid_t
-#elif defined(SCRIBE_UNIX) || defined(SCRIBE_LINUX)
+#elif defined(SCRIBE_UNIX) || defined(SCRIBE_LINUX) || defined(__gnuc__) || defined(__GNUC__)
 #   if defined(_POSIX_TIMERS)
 #       define SCRIBE_TIME_T struct timespec
 #   else

@@ -39,7 +39,7 @@ int scrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * con
     char printbuff[BUFFCAPACITY];
     char const * const wrt = scrb_build_msg(mi, fmt, printbuff, BUFFCAPACITY, msg, newline);
     
-    if (NULL == wrt) {
+    if (unlikely(NULL == wrt)) {
 #if SCRIBE_DEBUG
         scrb_debug_write("Failed to build log message, message length was %llu", strlen(msg));
 #endif
@@ -72,7 +72,7 @@ int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * co
 	char * msg;
 	vasprintf(&msg, msgfmt, ap);
 
-	if (NULL == msg) {
+	if (unlikely(NULL == msg)) {
 #if SCRIBE_DEBUG
 	    scrb_debug_write("Failed to build log message, message format length was %llu", strlen(msgfmt));
 #endif
@@ -83,7 +83,7 @@ int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * co
     char printbuff[BUFFCAPACITY];
     char const * const wrt = scrb_build_msg(mi, fmt, printbuff, BUFFCAPACITY, msg, newline);
     
-    if (NULL == wrt) {
+    if (unlikely(NULL == wrt)) {
 #if SCRIBE_DEBUG
         scrb_debug_write("Failed to build write string, length was %llu", strlen(wrt));
 #endif

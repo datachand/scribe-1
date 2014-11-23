@@ -9,6 +9,10 @@
 #ifndef SCRIBE_STREAM_H
 #define SCRIBE_STREAM_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -90,6 +94,10 @@ void scrb_flush_stream__internal(scrb_stream * const st);
 
 extern
 void scrb_purge_stream__internal(scrb_stream * const st);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

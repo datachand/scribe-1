@@ -12,12 +12,12 @@ test_dir=$(base)/test
 examples_dir=$(base)/examples
 
 sources=$(wildcard $(source_dir)/*.c)
-objects=$(patsubst $(source_dir)%, $(object_dir)/%, $(sources:.c=.o))
+objects=$(patsubst $(source_dir)/%, $(object_dir)/%, $(sources:.c=.o))
 
 target=$(build_dir)/libscribe.a
 
 CC?=clang
-std=c11
+std?=c11
 o_flags?=-O2
 dgb_flags?=-g0
 cflags=-std=$(std) $(o_flags) $(dbg_flags) $(OPTFLAGS) -Werror -Wall -Wextra -Wformat=2 -Wshadow \

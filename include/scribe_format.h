@@ -9,6 +9,10 @@
 #ifndef SCRIBE_FORMAT_H
 #define SCRIBE_FORMAT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -46,6 +50,10 @@ scrb_format * scrb_create_format__internal(char const * const fmtstr);
 
 extern
 void scrb_format_release__internal(scrb_format ** fmtptr);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

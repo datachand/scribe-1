@@ -9,6 +9,10 @@
 #ifndef SCRIBE_H
 #define SCRIBE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -210,6 +214,10 @@ int (fscrb_writeln)(struct scrb_meta_info const mi, scrb_stream const * const st
     return rval;
 }
 #define fscrb_writeln(st, fmt, msg, ...) (fscrb_writeln)(get_meta_info(), (st), (fmt), (msg), ##__VA_ARGS__)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

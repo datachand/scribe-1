@@ -9,6 +9,10 @@
 #ifndef SCRIBE_DEBUG_H
 #define SCRIBE_DEBUG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,6 +33,10 @@ void (scrb_debug_write)(struct scrb_meta_info const mi, char const * const msg, 
     va_end (ap);
 }
 #define scrb_debug_write(msg, ...) (scrb_debug_write)(get_meta_info(), (msg), ##__VA_ARGS__)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

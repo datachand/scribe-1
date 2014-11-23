@@ -9,6 +9,10 @@
 #ifndef SCRIBE_UTILS_H
 #define SCRIBE_UTILS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "scribe_conf.h"
 
 #include <stdbool.h>
@@ -66,6 +70,10 @@ SCRIBE_PID_T scrb_getpid(void)
 extern
 char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const fmt, char * const printbuff, 
                       uint64_t const cap, char const * const msg, bool const newline);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

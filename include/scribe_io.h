@@ -9,6 +9,10 @@
 #ifndef SCRIBE_IO_H
 #define SCRIBE_IO_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdarg.h>
 
 #include "scribe.h"
@@ -25,6 +29,10 @@ extern
 int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * const st,
                           struct scrb_format const * const fmt, char const * const msgfmt, 
                           bool const newline, va_list ap);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

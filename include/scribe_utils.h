@@ -15,6 +15,7 @@ extern "C" {
 
 #include "scribe_conf.h"
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -43,14 +44,8 @@ SCRIBE_TIME_T scrb_gettime(void)
 #if defined(SCRIBE_WINDOWS)
     SYSTEMTIME ts;
     GetSystemTime(&ts);
-#elif defined(SCRIBE_OSX) || !defined(_POSIX_TIMERS)
-    struct timeval ts;
-    gettimeofday(&ts, NULL);
-#elif defined(_POSIX_TIMERS)
-    struct timespec ts;
-    clock_gettime(CLOCK_REALTIME, &ts);
 #else
-    sturct timeval ts;
+    struct timeval ts;
     gettimeofday(&ts, NULL);
 #endif
     return ts;
@@ -69,6 +64,27 @@ SCRIBE_PID_T scrb_getpid(void)
 #define get_meta_info() (struct scrb_meta_info)                                 \
                     { .file = __FILE__, .mthd = __FUNCTION__, .line = __LINE__, \
                       .pid = scrb_getpid(), .ts = scrb_gettime() }
+
+static inline
+char * stringdup(char const * const str)
+{
+    uint64_t const len = strlen(str);
+    char * const new = malloc(len + 1);
+    if (NULL == new) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    memcpy(new, str, len);
+    new[len] = '\0';
+    return new;
+}
+
+static inline
+char const * charindex(char const * haystack, char const needle)
+{
+    while (*haystack != '\0' && *haystack != needle) { haystack += 1; }
+    return *haystack == '\0' ? (needle == '\0' ? haystack : NULL) : haystack;
+}
 
 extern
 char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const fmt, char * const printbuff, 

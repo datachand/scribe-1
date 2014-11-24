@@ -159,14 +159,6 @@ void scrb_flush_stream(scrb_stream * const st)
     scrb_flush_stream__internal(st);
 }
 
-// `scribe_purge_stream`
-// doc...
-static inline
-void scrb_purge_stream(scrb_stream * const st)
-{
-    scrb_purge_stream__internal(st);
-}
-
 // `scribe_write`
 // doc...
 static inline

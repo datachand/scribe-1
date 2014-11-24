@@ -93,9 +93,6 @@ void scrb_close_stream__internal(scrb_stream ** streamptr);
 extern
 void scrb_flush_stream__internal(scrb_stream * const st);
 
-extern
-void scrb_purge_stream__internal(scrb_stream * const st);
-
 #ifdef __cplusplus
 }
 #endif

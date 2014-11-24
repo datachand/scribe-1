@@ -19,6 +19,7 @@
 #include "scribe_debug.h"
 #include "scribe_types.h"
 #include "scribe_stream.h"
+#include "scribe_utils.h"
 #include "spinlock.h"
 
 scrb_stream * scrb_open_stream__internal(char const * const path, char const * const mode,
@@ -40,11 +41,11 @@ scrb_stream * scrb_open_stream__internal(char const * const path, char const * c
 		goto error;
 	}
 
-	bool const readable = (NULL == index(mode, 'r') && NULL == index(mode, '+')) ? false : true;
-	bool const writeable = (NULL == index(mode, 'w') && NULL == index(mode, '+')) ? false : true;
+	bool const readable = (NULL == charindex(mode, 'r') && NULL == charindex(mode, '+')) ? false : true;
+	bool const writeable = (NULL == charindex(mode, 'w') && NULL == charindex(mode, '+')) ? false : true;
 
 	struct scrb_stream tmp = {
-		.name = strdup(path),
+		.name = stringdup(path),
 		.readable = readable,
 		.writeable = writeable,
 		.synchronize = synchronize,
@@ -53,7 +54,7 @@ scrb_stream * scrb_open_stream__internal(char const * const path, char const * c
             .filestream = fd,
             .memmap = NULL,
             .offset = 0,
-            .pagesize = false == memmap ? 0 : getpagesize()
+            .pagesize = false == memmap ? 0 : sysconf(_SC_PAGESIZE)
         },
         .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
 	};
@@ -100,13 +101,6 @@ void scrb_flush_stream__internal(scrb_stream * const st)
 {
     if (NULL != st) {
         fflush(st->stream.filestream);
-    }
-}
-
-void scrb_purge_stream__internal(scrb_stream * const st)
-{
-    if (NULL != st) {
-        fpurge(st->stream.filestream);
     }
 }
 

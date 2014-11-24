@@ -42,15 +42,8 @@
 #if defined(SCRIBE_WINDOWS)
 #   define SCRIBE_TIME_T SYSTEMTIME
 #   define SCRIBE_PID_T int
-#elif defined(SCRIBE_OSX)
+#else
 #   define SCRIBE_TIME_T struct timeval
-#   define SCRIBE_PID_T pid_t
-#elif defined(SCRIBE_UNIX) || defined(SCRIBE_LINUX) || defined(__gnuc__) || defined(__GNUC__)
-#   if defined(_POSIX_TIMERS)
-#       define SCRIBE_TIME_T struct timespec
-#   else
-#       define SCRIBE_TIME_T struct timeval
-#   endif
 #   define SCRIBE_PID_T pid_t
 #endif
 

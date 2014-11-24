@@ -31,7 +31,7 @@ int main(void)
     }
     
     for (uint64_t i = 0; i < REPEATS; i += 1) {
-        scrb_writeln(log, fmt, "This writes to the log file.");
+        fscrb_writeln(log, fmt, "This writes to the log file %s #%d", "test", i);
     }
 
     scrb_close_stream(&log);

@@ -20,7 +20,8 @@
 #include "scribe_utils.h"
 #include "spinlock.h"
 
-#define BUFFCAPACITY 512
+#define MSGBUFFCAPACITY 512
+#define BUFFCAPACITY 1024
 
 /*static
 int mmap_write(char const * const msg, uint64_t const msglen, struct mmstream * const mmst)
@@ -70,19 +71,23 @@ int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * co
                           struct scrb_format const * const fmt, char const * const msgfmt, 
                           bool const newline, va_list ap)
 {
-	char * msg;
-	vasprintf(&msg, msgfmt, ap);
+	char msgbuff[MSGBUFFCAPACITY];
+	//vasprintf(&msg, msgfmt, ap);
+    uint64_t const retlen = vsnprintf(msgbuff, MSGBUFFCAPACITY, msgfmt, ap);
 
-	if (unlikely(NULL == msg)) {
+    // TODO: Find a better solution than failing when vsnprintf() runs out of room.
+	if (unlikely(retlen >= MSGBUFFCAPACITY)) {
 #if SCRIBE_DEBUG
 	    scrb_debug_write("Failed to build log message, message format length was %llu", strlen(msgfmt));
 #endif
 		errno = ENOMEM;
 		goto error;
-	}
+	} else {
+        
+    }
     
     char printbuff[BUFFCAPACITY];
-    char const * const wrt = scrb_build_msg(mi, fmt, printbuff, BUFFCAPACITY, msg, newline);
+    char const * const wrt = scrb_build_msg(mi, fmt, printbuff, BUFFCAPACITY, msgbuff, newline);
     
     if (unlikely(NULL == wrt)) {
 #if SCRIBE_DEBUG
@@ -109,5 +114,6 @@ error:
 	return (SCRIBE_Failure);
 }
 
+#undef MSGBUFFCAPACITY
 #undef BUFFCAPACITY
 

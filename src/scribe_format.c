@@ -16,6 +16,7 @@
 #include "scribe.h"
 #include "scribe_debug.h"
 #include "scribe_format.h"
+#include "scribe_utils.h"
 
 scrb_format * scrb_create_format__internal(char const * const fmtstr)
 {
@@ -32,7 +33,13 @@ scrb_format * scrb_create_format__internal(char const * const fmtstr)
         uint64_t numfmts;
     } tmp;
 
-    tmp.fmtstr = strdup(fmtstr);
+    tmp.fmtstr = stringdup(fmtstr);
+    if(NULL == tmp.fmtstr) {
+#if SCRIBE_DEBUG
+        scrb_debug_write("Failed to duplicate format string.");
+#endif
+        goto error;
+    }
     tmp.numfmts = 0;
     uint64_t const fl = strlen(tmp.fmtstr);
 

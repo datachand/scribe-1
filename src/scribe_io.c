@@ -72,7 +72,6 @@ int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * co
                           bool const newline, va_list ap)
 {
 	char msgbuff[MSGBUFFCAPACITY];
-	//vasprintf(&msg, msgfmt, ap);
     uint64_t const retlen = vsnprintf(msgbuff, MSGBUFFCAPACITY, msgfmt, ap);
 
     // TODO: Find a better solution than failing when vsnprintf() runs out of room.

@@ -29,7 +29,7 @@ lflags=-L$(biuld_dir)
 all: $(targets)
 
 $(targets): $(sources)
-	$(foreach tgt, $(targets), $(CC) $(iflags) $(cflags) $(tgt).c -o $(tgt) $(dep))
+	$(foreach tgt, $(targets), $(CC) $(iflags) $(cflags) $(tgt).c -o $(tgt) $(dep); )
 
 clean:
 	@rm -rf $(targets) *.dSYM *.log

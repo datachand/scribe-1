@@ -23,8 +23,8 @@ int main(void)
         exit (EXIT_FAILURE);
     }
 
-    // use the file "test.log" in write-only mode unsynchronized without mmap usage.
-    scrb_stream const * const log = scrb_open_stream("test.log", "a", false, false);
+    // use the file "test.log" in write-only mode unsynchronized.
+    scrb_stream const * const log = scrb_open_stream("test.log", "a", false);
     if (NULL == log) {
         scrb_format_release(&fmt);
         exit (EXIT_FAILURE);

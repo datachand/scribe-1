@@ -12,8 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/mman.h>
-#include <unistd.h>
 
 #include "scribe_conf.h"
 #include "scribe_debug.h"
@@ -22,8 +20,7 @@
 #include "scribe_utils.h"
 #include "spinlock.h"
 
-scrb_stream * scrb_open_stream__internal(char const * const path, char const * const mode,
-                                         bool const synchronize, bool const memmap)
+scrb_stream * scrb_open_stream__internal(char const * const path, char const * const mode, bool const synchronize)
 {
 	if (NULL == path || NULL == mode) {
 #if SCRIBE_DEBUG
@@ -49,12 +46,8 @@ scrb_stream * scrb_open_stream__internal(char const * const path, char const * c
 		.readable = readable,
 		.writeable = writeable,
 		.synchronize = synchronize,
-        .memmap = memmap,
         .stream = {
             .filestream = fd,
-            .memmap = NULL,
-            .offset = 0,
-            .pagesize = false == memmap ? 0 : sysconf(_SC_PAGESIZE)
         },
         .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
 	};

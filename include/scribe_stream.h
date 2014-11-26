@@ -29,12 +29,8 @@ struct scrb_stream {
     bool const readable;
 	bool const writeable;
 	bool const synchronize;
-    bool const memmap;
     struct {
         FILE * const filestream;
-        char * const memmap;        // unused if memmap is false.
-        uint64_t offset;            // " ... "
-        uint64_t const pagesize;    // " ... "
     } stream;
     spinlock_t rwlock;
 };
@@ -84,8 +80,7 @@ error:
 }
 
 extern
-scrb_stream * scrb_open_stream__internal(char const * const path, char const * const mode,
-                                         bool const synchronize, bool const memmap);
+scrb_stream * scrb_open_stream__internal(char const * const path, char const * const mode, bool const synchronize);
 
 extern
 void scrb_close_stream__internal(scrb_stream ** streamptr);

@@ -51,7 +51,6 @@ int scrb_init(void)
 	    .readable = false,
 	    .writeable = true,
 	    .synchronize = true,
-        .memmap = false,
         .stream = {
             .filestream = stdout
         },
@@ -63,7 +62,6 @@ int scrb_init(void)
 	    .readable = true,
 	    .writeable = false,
 	    .synchronize = true,
-        .memmap = false,
         .stream = {
             .filestream = stdin
         },
@@ -75,7 +73,6 @@ int scrb_init(void)
 	    .readable = false,
 	    .writeable = true,
 	    .synchronize = true,
-        .memmap = false,
         .stream = {
             .filestream = stderr
         },
@@ -88,7 +85,6 @@ int scrb_init(void)
         .readable = false,
         .writeable = true,
         .synchronize = true,
-        .memmap = false,
         .stream = {
             .filestream = fopen("scribedebug.log", "a")
         },
@@ -136,10 +132,9 @@ char const * scrb_stream_name(scrb_stream const * const st)
 // `scribe_open_file`
 // doc...
 static inline
-scrb_stream * scrb_open_stream(char const * const path, char const * const mode,
-                               bool const synchronize, bool const memmap)
+scrb_stream * scrb_open_stream(char const * const path, char const * const mode, bool const synchronize)
 {
-    return scrb_open_stream__internal(path, mode, synchronize, memmap);
+    return scrb_open_stream__internal(path, mode, synchronize);
 }
 
 // `scribe_close`

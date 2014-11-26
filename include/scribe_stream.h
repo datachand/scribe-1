@@ -65,18 +65,13 @@ void scrb_init_defaults(scrb_stream const * const outstream,
         va_end (ap); 
 #endif
         initialized = true;
-    } 
+    }
 }
 
 static inline
 char const * scrb_stream_name__internal(scrb_stream const * const st)
 {
-    if (NULL == st) {
-        goto error;
-    }
-    return st->name;
-error:
-    return NULL;
+    return (NULL == st ? NULL : st->name);
 }
 
 extern

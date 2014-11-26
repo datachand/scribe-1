@@ -33,13 +33,13 @@ scrb_stream * scrb_open_stream__internal(char const * const path, char const * c
 	FILE * const fd = fopen(path, mode);
 	if (NULL == fd) {
 #if SCRIBE_DEBUG
-		scrb_debug_write("Failed to open file.");
+		scrb_debug_write("Failed to open file %s in mode %s", path, mode);
 #endif
 		goto error;
 	}
 
-	bool const readable = (NULL == charindex(mode, 'r') && NULL == charindex(mode, '+')) ? false : true;
-	bool const writeable = (NULL == charindex(mode, 'w') && NULL == charindex(mode, '+')) ? false : true;
+	bool const readable = NULL != charindex(mode, 'r') || NULL != charindex(mode, '+');
+	bool const writeable = NULL != charindex(mode, 'w') || NULL != charindex(mode, '+');
 
 	struct scrb_stream tmp = {
 		.name = stringdup(path),

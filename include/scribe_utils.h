@@ -28,6 +28,9 @@ extern "C" {
 #include <unistd.h>
 #endif
 
+#define likely(x) __builtin_expect((x),1)
+#define unlikely(x) __builtin_expect((x),0)
+
 #include "scribe_format.h"
 
 struct scrb_meta_info {

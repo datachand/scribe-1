@@ -5,3 +5,4 @@ exec/*
 *.pdf
 *.dSYM
 *.swp
+*.log

@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include "scribe.h"
 
-#define REPEATS 1000000
+#define NREPEATS 1000000
 
 int main(void)
 {
@@ -24,13 +24,13 @@ int main(void)
     }
 
     // use the file "test.log" in write-only mode unsynchronized.
-    scrb_stream const * const log = scrb_open_stream("test.log", "a", false);
+    scrb_stream const * const log = scrb_open_stream("throughputtest.log", "w", false);
     if (NULL == log) {
         scrb_format_release(&fmt);
         exit (EXIT_FAILURE);
     }
     
-    for (uint64_t i = 0; i < REPEATS; i += 1) {
+    for (uint64_t i = 0; i < NREPEATS; i += 1) {
         fscrb_writeln(log, fmt, "This writes to the log file %s #%d", "test", i);
     }
 

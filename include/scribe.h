@@ -20,6 +20,7 @@ extern "C" {
 #include <stdlib.h>
 
 #include "scribe_conf.h"
+#include "scribe_debug.h"
 #include "scribe_io.h"
 #include "scribe_stream.h"
 #include "scribe_types.h"

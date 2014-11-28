@@ -29,7 +29,7 @@ iflags=-I$(include_dir) -I$(submodules_dir)/spinlock/include
 
 .PHONY: all update setup build test examples clean
 
-all: examples test
+all: examples
 
 update:
 	git submodule foreach git pull origin master

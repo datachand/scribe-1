@@ -84,13 +84,6 @@ char * stringdup(char const * const str)
     return new;
 }
 
-static inline
-char const * charindex(char const * haystack, char const needle)
-{
-    while (*haystack != '\0' && *haystack != needle) { haystack += 1; }
-    return *haystack == '\0' ? (needle == '\0' ? haystack : NULL) : haystack;
-}
-
 extern
 char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const fmt, char * const printbuff, 
                       uint64_t const cap, char const * const msg, bool const newline);

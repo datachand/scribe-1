@@ -32,7 +32,7 @@ void (scrb_debug_write)(struct scrb_meta_info const mi, char const * const msg, 
     fputc('\n', scrb_dbg_default.stream.filestream);
     va_end (ap);
 }
-#define scrb_debug_write(msg, ...) (scrb_debug_write)(get_meta_info(), (msg), ##__VA_ARGS__)
+#define scrb_debug_write(msg, ...) (scrb_debug_write)(get_meta_info(scrb_dbg_default.name), (msg), ##__VA_ARGS__)
 #endif
 
 #ifdef __cplusplus

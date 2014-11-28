@@ -49,8 +49,6 @@ int scrb_init(void)
 {
     scrb_stream const outstream = (scrb_stream) {
 	    .name = "stdout",
-	    .readable = false,
-	    .writeable = true,
 	    .synchronize = true,
         .stream = {
             .filestream = stdout
@@ -60,8 +58,6 @@ int scrb_init(void)
 
     scrb_stream const instream = (scrb_stream) {
 	    .name = "stdin",
-	    .readable = true,
-	    .writeable = false,
 	    .synchronize = true,
         .stream = {
             .filestream = stdin
@@ -71,8 +67,6 @@ int scrb_init(void)
 
     scrb_stream const errstream = (scrb_stream) {
 	    .name = "stderr",
-	    .readable = false,
-	    .writeable = true,
 	    .synchronize = true,
         .stream = {
             .filestream = stderr
@@ -83,8 +77,6 @@ int scrb_init(void)
 #if SCRIBE_DEBUG
     scrb_stream const dbgstream = (scrb_stream) {
         .name = "debug",
-        .readable = false,
-        .writeable = true,
         .synchronize = true,
         .stream = {
             .filestream = fopen("scribedebug.log", "a")
@@ -163,7 +155,7 @@ int (scrb_write)(struct scrb_meta_info const mi, scrb_stream const * const st,
 {
     return scrb_write__internal(mi, st, fmt, msg, false); 
 }
-#define scrb_write(st, fmt, msg) (scrb_write)(get_meta_info(), (st), (fmt), (msg))
+#define scrb_write(st, fmt, msg) (scrb_write)(get_meta_info((st)->name), (st), (fmt), (msg))
 
 // `scribe_writeln`
 // doc...
@@ -173,7 +165,7 @@ int (scrb_writeln)(struct scrb_meta_info const mi, scrb_stream const * const st,
 {
     return scrb_write__internal(mi, st, fmt, msg, true); 
 }
-#define scrb_writeln(st, fmt, msg) (scrb_writeln)(get_meta_info(), (st), (fmt), (msg))
+#define scrb_writeln(st, fmt, msg) (scrb_writeln)(get_meta_info((st)->name), (st), (fmt), (msg))
 
 // `fscribe_write`
 // doc...
@@ -187,7 +179,7 @@ int (fscrb_write)(struct scrb_meta_info const mi, scrb_stream const * const st,
     va_end (ap);
     return rval;
 }
-#define fscrb_write(st, fmt, msg, ...) (fscrb_write)(get_meta_info(), (st), (fmt), (msg), ##__VA_ARGS__)
+#define fscrb_write(st, fmt, msg, ...) (fscrb_write)(get_meta_info((st)->name), (st), (fmt), (msg), ##__VA_ARGS__)
 
 // `fscribe_writeln`
 // doc...
@@ -201,7 +193,7 @@ int (fscrb_writeln)(struct scrb_meta_info const mi, scrb_stream const * const st
     va_end (ap);
     return rval;
 }
-#define fscrb_writeln(st, fmt, msg, ...) (fscrb_writeln)(get_meta_info(), (st), (fmt), (msg), ##__VA_ARGS__)
+#define fscrb_writeln(st, fmt, msg, ...) (fscrb_writeln)(get_meta_info((st)->name), (st), (fmt), (msg), ##__VA_ARGS__)
 
 #ifdef __cplusplus
 }

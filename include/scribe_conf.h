@@ -23,8 +23,15 @@
 
 #define SCRIBE_RWLOCK_DELAY 50
 
+// GNU extension availability
+#if defined(__gnuc__) || defined(__GNUC__)
+#   define SCRIBE_GNUC_AVAILABLE 1
+#else
+#   define SCRIBE_GNUC_AVAILABLE 0
+#endif
+
 // OS specific configuration
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) || defined(_WIN64)
 #   define SCRIBE_WINDOWS
 #elif defined(__APPLE__) || defined(__MACH__)
 #   define SCRIBE_OSX
@@ -32,7 +39,7 @@
 #   define SCRIBE_UNIX
 #elif defined(linux) || defined(__linux__) || defined(__linux)
 #   define SCRIBE_LINUX
-#elif !(defined(__gnuc__) || defined(__GNUC__))
+#else
 #   error "Unknown OS, can\'t decide which types to use!"
 #endif
 

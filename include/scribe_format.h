@@ -20,19 +20,18 @@ extern "C" {
 
 typedef enum {
     FMT_UNKOWN = -1,
-    FMT_ID = 0,
-    FMT_FILE = 1,
-    FMT_MTHD = 2,
-    FMT_LINE = 3,
-    FMT_PID = 4,
-    FMT_TIME = 5,
-    FMT_STREMNAME = 6,
-    FMT_MSG = 7,
-    FMT_PRCNT = 8
+    FMT_FILE = 0,
+    FMT_MTHD = 1,
+    FMT_LINE = 2,
+    FMT_PID = 3,
+    FMT_TIME = 4,
+    FMT_STREAMNAME = 5,
+    FMT_MSG = 6,
+    FMT_PRCNT = 7
 } fmttype;
 
 static
-char const fmtflags[] = { 'i', 'F', 'M', 'L', 'p', 't', 'n', 'm', '%' };
+char const fmtflags[] = { 'F', 'M', 'L', 'p', 't', 'n', 'm', '%' };
 
 static
 uint64_t const num_fmtflags = sizeof(fmtflags) / sizeof(fmtflags[0]);

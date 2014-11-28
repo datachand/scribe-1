@@ -38,13 +38,8 @@ scrb_stream * scrb_open_stream__internal(char const * const path, char const * c
 		goto error;
 	}
 
-	bool const readable = NULL != charindex(mode, 'r') || NULL != charindex(mode, '+');
-	bool const writeable = NULL != charindex(mode, 'w') || NULL != charindex(mode, '+');
-
 	struct scrb_stream tmp = {
 		.name = stringdup(path),
-		.readable = readable,
-		.writeable = writeable,
 		.synchronize = synchronize,
         .stream = {
             .filestream = fd,

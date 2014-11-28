@@ -153,6 +153,24 @@ char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const 
                     break;
                 }
                 */
+                case (FMT_STREAMNAME):
+                {
+                    addlen = strlen(mi.streamname);
+                    if (unlikely(wrtlen + addlen >= wrtcap)) {
+                        wrtstr = reallocstr(wrtstr, allocated, 2 * wrtcap);
+                        if (NULL == wrtstr) {
+                            goto error;
+                        }
+                        if (!allocated) {
+                            memcpy(wrtstr, printbuff, wrtlen);
+                        }
+                        allocated = true;
+                        wrtcap *= 2;
+                        wrtpos = wrtstr + wrtlen;
+                    }
+                    memcpy(wrtpos, mi.streamname, addlen);
+                    break;
+                }
                 case (FMT_MSG):
                 {
                     addlen = strlen(msg);
@@ -169,6 +187,24 @@ char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const 
                         wrtpos = wrtstr + wrtlen;
                     } 
                     memcpy(wrtpos, msg, addlen);
+                    break;
+                }
+                case (FMT_PRCNT):
+                {
+                    addlen = 1;
+                    if (unlikely(wrtlen + addlen >= wrtcap)) {
+                        wrtstr = reallocstr(wrtstr, allocated, 2 * wrtcap);
+                        if (NULL == wrtstr) {
+                            goto error;
+                        }
+                        if (!allocated) {
+                            memcpy(wrtstr, printbuff, wrtlen);
+                        }
+                        allocated = true;
+                        wrtcap *= 2;
+                        wrtpos = wrtstr + wrtlen;
+                    }
+                    *wrtpos = '%';
                     break;
                 }
                 default:

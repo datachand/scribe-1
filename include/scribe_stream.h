@@ -26,9 +26,7 @@ extern "C" {
 
 struct scrb_stream {
 	char const * const name;
-    bool const readable;
-	bool const writeable;
-	bool const synchronize;
+    bool const synchronize;
     struct {
         FILE * const filestream;
     } stream;
@@ -52,8 +50,13 @@ void scrb_init_defaults(scrb_stream const * const outstream,
                         scrb_stream const * const instream,
                         scrb_stream const * const errstream, ...)
 {
-    static bool initialized = false;
-    if (!initialized) {
+    static volatile int initialized = 0;
+
+#if defined(SCRIBE_WINDOWS)
+    if (0 == InterlockedCompareExchange(&initialized, 1, 0)) {
+#else    
+    if (__sync_bool_compare_and_swap(&initialized, 0, 1)) {
+#endif
         memcpy((void *)&stream_out_default, outstream, sizeof(scrb_stream));
         memcpy((void *)&stream_in_default, instream, sizeof(scrb_stream));
         memcpy((void *)&stream_err_default, errstream, sizeof(scrb_stream));
@@ -64,7 +67,6 @@ void scrb_init_defaults(scrb_stream const * const outstream,
         memcpy((void *)&scrb_dbg_default, dbgstream, sizeof(scrb_stream));
         va_end (ap); 
 #endif
-        initialized = true;
     }
 }
 

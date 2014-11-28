@@ -45,7 +45,7 @@ char const * build_alloced(char const * const msgfmt, va_list ap)
         if (retlen < trysize) {
             break;
         }
-    } while(trysize <= SCRB_MAXMSGLEN);
+    } while(trysize <= (SCRB_MAXMSGLEN/2));
     return msg;
 }
 
@@ -60,14 +60,16 @@ int scrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * con
         scrb_debug_write("Failed to build log message, message length was %llu", strlen(msg));
 #endif
         goto error;
-    } else {
-        if (st->synchronize) {
-            thread_lock_acquire((spinlock_t *)&st->rwlock);
-        }
-        fputs(wrt, st->stream.filestream);
-        if (st->synchronize) {
-            thread_lock_release((spinlock_t *)&st->rwlock);
-        }
+    }
+    
+    if (st->synchronize) {
+        thread_lock_acquire((spinlock_t *)&st->rwlock);
+    }
+
+    int const rc = fputs(wrt, st->stream.filestream);
+    
+    if (st->synchronize) {
+        thread_lock_release((spinlock_t *)&st->rwlock);
     }
    
     // the message builder had to allocate space,
@@ -76,7 +78,7 @@ int scrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * con
         free((void *) wrt);
     }
 
-    return (SCRIBE_Success);
+    return rc != EOF ? (SCRIBE_Success) : (SCRIBE_Failure);
 error:
     return (SCRIBE_Failure);
 }
@@ -116,14 +118,17 @@ int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * co
 #if SCRIBE_DEBUG
         scrb_debug_write("Failed to build write string, length was %llu", strlen(wrt));
 #endif
-    } else {
-        if (st->synchronize) {
-            thread_lock_acquire((spinlock_t *)&st->rwlock);
-        }
-        fputs(wrt, st->stream.filestream);
-        if (st->synchronize) {
-            thread_lock_release((spinlock_t *)&st->rwlock);
-        }
+        goto error;
+    }
+
+    if (st->synchronize) {
+        thread_lock_acquire((spinlock_t *)&st->rwlock);
+    }
+    
+    int const rc = fputs(wrt, st->stream.filestream);
+    
+    if (st->synchronize) {
+        thread_lock_release((spinlock_t *)&st->rwlock);
     }
 	
     // the message builder had to allocate space,
@@ -132,7 +137,7 @@ int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * co
         free((void *) wrt);
     }
 
-    return (SCRIBE_Success);
+    return rc != EOF ? (SCRIBE_Success) : (SCRIBE_Failure);
 error:
 	return (SCRIBE_Failure);
 }

@@ -54,9 +54,7 @@ scrb_format * scrb_create_format__internal(char const * const fmtstr)
             continue;
         } else {
             char const fmtchar = *(curpos + 1);
-            if (fmtchar == fmtflags[FMT_ID]) {
-                tmp_fmttypes[tmp.numfmts] = FMT_ID;
-            } else if (fmtchar == fmtflags[FMT_FILE]) {
+            if (fmtchar == fmtflags[FMT_FILE]) {
                 tmp_fmttypes[tmp.numfmts] = FMT_FILE;
             } else if (fmtchar == fmtflags[FMT_MTHD]) {
                 tmp_fmttypes[tmp.numfmts] = FMT_MTHD;

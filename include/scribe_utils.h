@@ -35,6 +35,7 @@ extern "C" {
 #include "scribe_types.h"
 
 struct scrb_meta_info {
+    char const * const streamname;
     char const * const file;
     char const * const mthd;
     int const line;
@@ -65,9 +66,9 @@ SCRIBE_PID_T scrb_getpid(void)
 #endif
 }
 
-#define get_meta_info() (struct scrb_meta_info)                                 \
-                    { .file = __FILE__, .mthd = __FUNCTION__, .line = __LINE__, \
-                      .pid = scrb_getpid(), .ts = scrb_gettime() }
+#define get_meta_info(stname) (struct scrb_meta_info)                                   \
+                    { .streamname = (stname), .file = __FILE__, .mthd = __FUNCTION__,   \
+                      .line = __LINE__, .pid = scrb_getpid(), .ts = scrb_gettime() }
 
 static inline
 char * stringdup(char const * const str)

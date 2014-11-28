@@ -32,6 +32,7 @@ extern "C" {
 #define unlikely(x) __builtin_expect((x),0)
 
 #include "scribe_format.h"
+#include "scribe_types.h"
 
 struct scrb_meta_info {
     char const * const file;

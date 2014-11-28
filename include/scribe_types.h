@@ -13,9 +13,20 @@
 extern "C" {
 #endif
 
-enum scribe_return {
+enum scrb_return {
 	SCRIBE_Success = 0,
 	SCRIBE_Failure = 1
+};
+
+enum scrb_loglevel {
+    LVLDEBUG  = 0,
+    LVLTRACE  = 1,
+    LVLINFO   = 2,
+    LVLNOTICE = 3,
+    LVLWARN   = 4,
+    LVLALERT  = 5,
+    LVLERROR  = 6,
+    LVLPANIC  = 7
 };
 
 #ifdef __cplusplus

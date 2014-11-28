@@ -72,7 +72,7 @@ int scrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * con
    
     // the message builder had to allocate space,
     // so we'll have to free it. 
-    if (wrt != printbuff) {
+    if (unlikely(wrt != printbuff)) {
         free((void *) wrt);
     }
 
@@ -128,7 +128,7 @@ int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * co
 	
     // the message builder had to allocate space,
     // so we'll have to free it. 
-    if (wrt != printbuff) {
+    if (unlikely(wrt != printbuff)) {
         free((void *) wrt);
     }
 

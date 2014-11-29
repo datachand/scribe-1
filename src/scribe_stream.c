@@ -43,6 +43,7 @@ scrb_stream * scrb_open_stream__internal(char const * const path, char const * c
 		.synchronize = synchronize,
         .stream = {
             .filestream = fd,
+            .mode = mode
         },
         .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
 	};
@@ -83,6 +84,53 @@ void scrb_close_stream__internal(scrb_stream ** streamptr)
 		free((void *)*streamptr);
 		*streamptr = NULL;
 	}
+}
+
+int scrb_swap_filepath(scrb_stream * const st, char const * const newfilepath)
+{
+    FILE * const newfd = fopen(newfilepath, st->stream.mode);
+    if (NULL == newfd) {
+#if SCRIBE_DEBUG
+        scrb_debug_write("Failed to open new file %s in mode \"%s\"", newfilepath, st->stream.mode);
+#endif
+        goto error;
+    } else {
+        if (st->synchronize) {
+            thread_lock_acquire(&st->rwlock);
+        }
+        st->name = newfilepath;
+        fclose(st->stream.filestream);
+        *(struct streaminfo *)&st->stream = (struct streaminfo) { .filestream = newfd, .mode = st->stream.mode };
+        if (st->synchronize) {
+            thread_lock_release(&st->rwlock);
+        }
+    }
+    return (SCRIBE_Success);
+error:
+    return (SCRIBE_Failure);
+}
+
+int scrb_swap_filedes(scrb_stream * const st, FILE * const newfd, char const * const name)
+{
+    if (NULL == newfd) {
+#if SCRIBE_DEBUG
+        scrb_debug_write("Bad file descriptor.");
+#endif
+        goto error;
+    } else {
+        if (st->synchronize) {
+            thread_lock_acquire(&st->rwlock);
+        }
+        st->name = name;
+        fclose(st->stream.filestream);
+        *(struct streaminfo *)&st->stream = (struct streaminfo) { .filestream = newfd, .mode = st->stream.mode };
+        if (st->synchronize) {
+            thread_lock_release(&st->rwlock);
+        }
+    }
+    return (SCRIBE_Success);
+error:
+    return (SCRIBE_Failure);
 }
 
 void scrb_flush_stream__internal(scrb_stream * const st)

@@ -18,7 +18,7 @@ int main(void)
         exit (EXIT_FAILURE);
     }
     
-    scrb_format const * const fmt = scrb_create_format("(%p|%F|%L|%M) %m");
+    scrb_format const * const fmt = scrb_create_format("(%t|%p|%F|%L|%M) %m", NULL);
     if (NULL == fmt) {
         exit (EXIT_FAILURE);
     }

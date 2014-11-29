@@ -40,6 +40,43 @@ void * threadlog(void * arg)
     return NULL;
 }
 
+static
+void writetime(char ** buff, size_t * len, SCRIBE_TIME_T ts)
+{
+    *buff = NULL;
+    *len = 0;
+    (void) ts;
+/*    // length of the final time string we produce
+#define TIMELEN 25
+    char * writedst;
+
+    // if the buffer size given to us by the library is
+    // smaller than we need, we'll use the given `buff`
+    // pointer and allocate enough room.
+    if (TIMELEN > *maxlen) {
+        *buff = malloc(TIMELEN * sizeof(char));
+        if (NULL == *buff) {
+            goto error;
+        }
+    }
+
+    writedst = *buff;
+#if defined(SCRIBE_WINDOWS)
+    snprinf(writedst, TIMELEN, "%04d:%02d:%02d:%02d:%02d:%02d.%03d",
+            ts.wYear, ts.wMonth, ts.wDay, ts.wHour, 
+            ts.wMinute, ts.wSecond, ts.Milliseconds);
+#else
+    strftime(writedst, TIMELEN, "%G:%m:%d:%H:%M:%S.", localtime(&ts.tv_sec));
+    snprintf(writedst + 20, 4, "%ld", (long int) ts.tv_usec);
+#endif 
+    *maxlen = TIMELEN;
+    return (SCRIBE_Success);
+error:
+    return (SCRIBE_Failure);
+#undef TIMELEN
+*/
+}
+
 int main(void)
 {
 #if defined(PTHREAD)
@@ -51,7 +88,7 @@ int main(void)
         exit (EXIT_FAILURE);
     }
     
-    scrb_format const * const fmt = scrb_create_format("(%p|%F|%L|%M) %m");
+    scrb_format const * const fmt = scrb_create_format("(%F|%L|%M) %m", &writetime);
     if (NULL == fmt) {
         exit (EXIT_FAILURE);
     }

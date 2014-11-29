@@ -100,9 +100,9 @@ int scrb_init(void)
 // `scrb_create_format`
 // doc...
 static inline
-scrb_format * scrb_create_format(char const * const fmtstr)
+scrb_format * scrb_create_format(char const * const fmtstr, void (*timehook)(char ** buff, size_t * len, SCRIBE_TIME_T ts))
 {
-    return scrb_create_format__internal(fmtstr);
+    return scrb_create_format__internal(fmtstr, timehook);
 }
 
 //

@@ -39,6 +39,8 @@ struct scrb_meta_info {
     char const * const file;
     char const * const mthd;
     int const line;
+    uint64_t const filelen;
+    uint64_t const mthdlen;
     SCRIBE_PID_T pid;
     SCRIBE_TIME_T ts;
 };
@@ -66,9 +68,15 @@ SCRIBE_PID_T scrb_getpid(void)
 #endif
 }
 
-#define get_meta_info(stname) (struct scrb_meta_info)                                   \
-                    { .streamname = (stname), .file = __FILE__, .mthd = __FUNCTION__,   \
-                      .line = __LINE__, .pid = scrb_getpid(), .ts = scrb_gettime() }
+#define get_meta_info(stname) (struct scrb_meta_info) {         \
+                        .streamname = (stname),                 \
+                        .file = __FILE__,                       \
+                        .mthd = __FUNCTION__,                   \
+                        .line = __LINE__,                       \
+                        .filelen = sizeof((__FILE__)) - 1,      \
+                        .mthdlen = sizeof((__FUNCTION__)) - 1 , \
+                        .pid = scrb_getpid(),                   \
+                        .ts = scrb_gettime() }
 
 static inline
 char * stringdup(char const * const str)

@@ -17,6 +17,7 @@ extern "C" {
 #include <stdlib.h>
 
 #include "scribe_conf.h"
+#include "scribe_utils.h"
 
 typedef enum {
     FMT_UNKOWN = -1,
@@ -31,13 +32,14 @@ typedef enum {
 } fmttype;
 
 static
-char const fmtflags[] = { 'F', 'M', 'L', 'p', 't', 'n', 'm', '%' };
+char const fmtflags[] = { 'F', 'M', 'L', 'p', 't', 's', 'm', '%' };
 
 static
 uint64_t const num_fmtflags = sizeof(fmtflags) / sizeof(fmtflags[0]);
 
 struct scrb_format {
     char const * fmtstr;
+    void (*timehook)(char ** buff, size_t * len, SCRIBE_TIME_T ts);
     fmttype const * fmttypes;
     uint64_t numfmts;
 };
@@ -45,7 +47,7 @@ struct scrb_format {
 typedef struct scrb_format scrb_format;
 
 extern
-scrb_format * scrb_create_format__internal(char const * const fmtstr);
+scrb_format * scrb_create_format__internal(char const * const fmtstr, void (*timehook)(char ** buff, size_t * len, SCRIBE_TIME_T ts));
 
 extern
 void scrb_format_release__internal(scrb_format ** fmtptr);

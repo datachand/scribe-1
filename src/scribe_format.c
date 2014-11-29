@@ -18,7 +18,7 @@
 #include "scribe_format.h"
 #include "scribe_utils.h"
 
-scrb_format * scrb_create_format__internal(char const * const fmtstr)
+scrb_format * scrb_create_format__internal(char const * const fmtstr, void (*timehook)(char ** buff, size_t * len, SCRIBE_TIME_T ts))
 {
     if (NULL == fmtstr) {
 #if SCRIBE_DEBUG
@@ -29,6 +29,7 @@ scrb_format * scrb_create_format__internal(char const * const fmtstr)
 {
     struct {
         char const * fmtstr;
+        void (*timehook)(char ** buff, size_t * maxlen, SCRIBE_TIME_T ts);
         fmttype * fmttypes;
         uint64_t numfmts;
     } tmp;
@@ -40,6 +41,8 @@ scrb_format * scrb_create_format__internal(char const * const fmtstr)
 #endif
         goto error;
     }
+
+    tmp.timehook = timehook;
     tmp.numfmts = 0;
     uint64_t const fl = strlen(tmp.fmtstr);
 
@@ -64,11 +67,16 @@ scrb_format * scrb_create_format__internal(char const * const fmtstr)
                 tmp_fmttypes[tmp.numfmts] = FMT_PID;
             } else if (fmtchar == fmtflags[FMT_TIME]) {
                 tmp_fmttypes[tmp.numfmts] = FMT_TIME;
+            } else if (fmtchar == fmtflags[FMT_STREAMNAME]) {
+                tmp_fmttypes[tmp.numfmts] = FMT_STREAMNAME;
             } else if (fmtchar == fmtflags[FMT_MSG]) {
                 tmp_fmttypes[tmp.numfmts] = FMT_MSG;
             } else if (fmtchar == fmtflags[FMT_PRCNT]) {
                 tmp_fmttypes[tmp.numfmts] = FMT_PRCNT;
             } else {
+#if SCRIBE_DEBUG
+                scrb_debug_write("Unrecongnized format character '%c'", fmtchar);
+#endif
                 goto error;
             }
             tmp.numfmts += 1;

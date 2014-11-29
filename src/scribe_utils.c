@@ -27,8 +27,8 @@ char * reallocstr(char * str, bool const build_string_allocated, uint64_t const 
 }
 
 static inline
-int writestr(char ** const build_string, char * const printbuff, bool * const build_string_allocated, uint64_t * const build_string_cap,
-             char ** const writing_pos, uint64_t * const written_length, char const * const add_string, uint64_t const addlen)
+int checklen(char ** const build_string, char * const printbuff, bool * const build_string_allocated,
+             uint64_t * const build_string_cap, char ** const writing_pos, uint64_t * const written_length, uint64_t const addlen)
 {
     if (unlikely(*written_length + addlen >= *build_string_cap)) {
         *build_string = reallocstr(*build_string, *build_string_allocated, *build_string_cap * 2);
@@ -42,9 +42,6 @@ int writestr(char ** const build_string, char * const printbuff, bool * const bu
         *build_string_cap = *build_string_cap * 2;
         *writing_pos = *build_string + *written_length;
     }
-    memcpy(*writing_pos, add_string, addlen);
-    *writing_pos = *writing_pos + addlen;
-    *written_length = *written_length + addlen;
     return (SCRIBE_Success);
 error:
     return (SCRIBE_Failure);
@@ -164,8 +161,11 @@ char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const 
                 default:
                     break;
             }
-            writestr(&build_string, printbuff, &build_string_allocated, &build_string_cap, 
-                     &writing_pos, &written_length, add_string, addlen);
+            checklen(&build_string, printbuff, &build_string_allocated,
+                     &build_string_cap, &writing_pos, &written_length, addlen);
+            memcpy(writing_pos, add_string, addlen);
+            writing_pos += addlen;
+            written_length += addlen;
             if (addstring_allocated) {
                 free((void *)add_string);
             }
@@ -174,8 +174,11 @@ char * scrb_build_msg(struct scrb_meta_info const mi, scrb_format const * const 
     }
 
     if (newline) {
-        writestr(&build_string, printbuff, &build_string_allocated, &build_string_cap,
-                 &writing_pos, &written_length, "\n", 1);
+        checklen(&build_string, printbuff, &build_string_allocated, &build_string_cap,
+                 &writing_pos, &written_length, 1);
+        *writing_pos = '\n';
+        writing_pos += 1;
+        written_length += 1;
     }
 
     *writing_pos = '\0'; // clean off the end of the buffer before it's written to the output stream

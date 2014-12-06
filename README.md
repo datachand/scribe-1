@@ -3,6 +3,8 @@
 ## Description
 A fast and simple stream based logging library for C. Note, most of the api is unstable at the moment.
 
+Currently scribe is known to build successfully on OS X with clang-600.0.56 and gcc 4.9.2.
+
 Author: Dalton Woodard
 
 Contact: daltonmwoodard@gmail.com

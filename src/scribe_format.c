@@ -6,24 +6,28 @@
 // License: Please see LICENSE.md
 //
 
-#include "scribe_conf.h"
-
+#include <errno.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "scribe.h"
+#include "scribe_conf.h"
 #include "scribe_debug.h"
 #include "scribe_format.h"
 #include "scribe_utils.h"
 
-scrb_format * scrb_create_format__internal(char const * const fmtstr, void (*timehook)(char ** buff, size_t * len, SCRIBE_TIME_T ts))
+struct scrb_format * scrb_create_format__internal(char const * const fmtstr, 
+                                                  void (*timehook)(char ** buff, 
+                                                                   size_t * len, 
+                                                                   SCRIBE_TIME_T ts))
 {
     if (NULL == fmtstr) {
 #if SCRIBE_DEBUG
         scrb_debug_write("NULL format string.");
 #endif
+        errno = EINVAL;
         goto error;
     }
 {
@@ -42,8 +46,8 @@ scrb_format * scrb_create_format__internal(char const * const fmtstr, void (*tim
         goto error;
     }
 
-    tmp.timehook = timehook;
-    tmp.numfmts = 0;
+    tmp.timehook      = timehook;
+    tmp.numfmts       = 0;
     uint64_t const fl = strlen(tmp.fmtstr);
 
     // using trivial upper bound on how many possible
@@ -80,7 +84,7 @@ scrb_format * scrb_create_format__internal(char const * const fmtstr, void (*tim
                 goto error;
             }
             tmp.numfmts += 1;
-            curpos += 1;
+            curpos      += 1;
         }
     }
     
@@ -96,10 +100,10 @@ error:
     return NULL;
 }
 
-void scrb_format_release__internal(scrb_format ** fmtptr)
+void scrb_format_release__internal(struct scrb_format ** fmtptr)
 {
     if (NULL != fmtptr && NULL != *fmtptr) {
-        scrb_format * fmt = *fmtptr;
+        struct scrb_format * fmt = *fmtptr;
         free((void *)fmt->fmtstr);
         free((void *)fmt->fmttypes);
         free(fmt);

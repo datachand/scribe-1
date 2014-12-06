@@ -44,13 +44,14 @@ struct scrb_format {
     uint64_t numfmts;
 };
 
-typedef struct scrb_format scrb_format;
+extern
+struct scrb_format * scrb_create_format__internal(char const * const fmtstr, 
+                                                  void (*timehook)(char ** buff, 
+                                                                   size_t * len, 
+                                                                   SCRIBE_TIME_T ts));
 
 extern
-scrb_format * scrb_create_format__internal(char const * const fmtstr, void (*timehook)(char ** buff, size_t * len, SCRIBE_TIME_T ts));
-
-extern
-void scrb_format_release__internal(scrb_format ** fmtptr);
+void scrb_format_release__internal(struct scrb_format ** fmtptr);
 
 #ifdef __cplusplus
 }

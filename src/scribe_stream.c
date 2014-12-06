@@ -7,12 +7,15 @@
 //
 
 #include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "scribe.h"
 #include "scribe_conf.h"
 #include "scribe_debug.h"
 #include "scribe_types.h"
@@ -20,30 +23,42 @@
 #include "scribe_utils.h"
 #include "spinlock.h"
 
-scrb_stream * scrb_open_stream__internal(char const * const path, char const * const mode, bool const synchronize)
+struct scrb_stream * scrb_open_stream__internal(char const * const path, 
+                                                char const * const mode, 
+                                                bool const synchronize, 
+                                                bool const use_buffer)
 {
-	if (NULL == path || NULL == mode) {
+    (void) use_buffer;
+	if (NULL == path) {
 #if SCRIBE_DEBUG
-		scrb_debug_write("NULL path and/or mode string.");
+		scrb_debug_write("NULL path string.");
 #endif
 		errno = EINVAL;
 		goto error;
-	}
-
-	FILE * const fd = fopen(path, mode);
-	if (NULL == fd) {
+	} else if (NULL == mode) {
 #if SCRIBE_DEBUG
-		scrb_debug_write("Failed to open file %s in mode %s", path, mode);
+        scrb_debug_write("NULL mode string.h");
+#endif
+        errno = EINVAL;
+        goto error;
+    }
+
+    FILE * const filestream = fopen(path, mode);
+	if (NULL == filestream) {
+#if SCRIBE_DEBUG
+		scrb_debug_write("Failed to open file %s: %s", path, strerror(errno));
 #endif
 		goto error;
 	}
-
-	struct scrb_stream tmp = {
-		.name = stringdup(path),
+	
+    int const fd = fileno(filestream);
+    struct scrb_stream tmp = {
+		.name        = stringdup(path),
 		.synchronize = synchronize,
         .stream = {
-            .filestream = fd,
-            .mode = mode
+            .filestream = filestream,
+            .filedes    = fd,
+            .mode       = mode,
         },
         .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
 	};
@@ -52,18 +67,18 @@ scrb_stream * scrb_open_stream__internal(char const * const path, char const * c
 #if SCRIBE_DEBUG
 		scrb_debug_write("Failed to copy name.");
 #endif
-		fclose(fd);
+		fclose(filestream);
 		errno = ENOMEM;
 		goto error;
 	}
 
-	scrb_stream * new_stream = malloc(sizeof(struct scrb_stream));
+	struct scrb_stream * new_stream = malloc(sizeof(struct scrb_stream));
 	if (NULL == new_stream) {
 #if SCRIBE_DEBUG
 		scrb_debug_write("Failed to create new stream object.");
 #endif
 		free((void *)tmp.name);
-		fclose(fd);
+		fclose(filestream);
 		errno = ENOMEM;
 		goto error;
 	}
@@ -74,9 +89,16 @@ error:
 	return NULL;
 }
 
-void scrb_close_stream__internal(scrb_stream ** streamptr)
+void scrb_close_stream__internal(struct scrb_stream ** streamptr)
 {
-	if (NULL != streamptr && NULL != *streamptr) {
+	if (NULL != streamptr && NULL != *streamptr
+     && *streamptr != scrb_stdout
+     && *streamptr != scrb_stdin
+     && *streamptr != scrb_stderr
+#if SCRIBE_DEBUG
+     && *streamptr != scrb_debug
+#endif
+     ) {
 		free((void *)(*streamptr)->name);
 		if (0 != (*streamptr)->stream.filestream) {
 			fclose((*streamptr)->stream.filestream);
@@ -86,54 +108,126 @@ void scrb_close_stream__internal(scrb_stream ** streamptr)
 	}
 }
 
-int scrb_swap_filepath(scrb_stream * const st, char const * const newfilepath)
+int scrb_swap_filepath(struct scrb_stream * const st, 
+                       char const * const newfilepath, 
+                       char const * const mode)
 {
-    FILE * const newfd = fopen(newfilepath, st->stream.mode);
-    if (NULL == newfd) {
+    if (NULL == newfilepath || NULL == mode) {
+#if SCRIBE_DEBUG
+        scrb_debug_write("Bad filepath or mode string.");
+#endif
+        errno = EINVAL;
+        goto error;
+    }
+
+    FILE * const newfilestream = fopen(newfilepath, st->stream.mode);
+    if (NULL == newfilestream) {
 #if SCRIBE_DEBUG
         scrb_debug_write("Failed to open new file %s in mode \"%s\"", newfilepath, st->stream.mode);
 #endif
         goto error;
-    } else {
-        if (st->synchronize) {
-            thread_lock_acquire(&st->rwlock);
-        }
-        st->name = newfilepath;
-        fclose(st->stream.filestream);
-        *(struct streaminfo *)&st->stream = (struct streaminfo) { .filestream = newfd, .mode = st->stream.mode };
-        if (st->synchronize) {
-            thread_lock_release(&st->rwlock);
-        }
     }
-    return (SCRIBE_Success);
+    
+    if (st->synchronize) {
+        thread_lock_acquire(&st->rwlock);
+    }
+    int const newfiledes = fileno(newfilestream);
+    st->name = newfilepath;
+    fclose(st->stream.filestream);
+    *(struct streaminfo *)&st->stream = (struct streaminfo) { 
+                                            .filestream    = newfilestream,
+                                            .filedes       = newfiledes, 
+                                            .mode          = mode,
+                                        };
+    if (st->synchronize) {
+        thread_lock_release(&st->rwlock);
+    }
+
+    return (SCRB_Success);
 error:
-    return (SCRIBE_Failure);
+    return (SCRB_Failure);
 }
 
-int scrb_swap_filedes(scrb_stream * const st, FILE * const newfd, char const * const name)
+int scrb_swap_filestream(struct scrb_stream * const st, 
+                         FILE * const newfilestream, 
+                         char const * const mode, 
+                         char const * const name)
 {
-    if (NULL == newfd) {
+    if (NULL == newfilestream) {
 #if SCRIBE_DEBUG
-        scrb_debug_write("Bad file descriptor.");
+        scrb_debug_write("Bad file stream.");
 #endif
+        errno = EINVAL;
         goto error;
-    } else {
-        if (st->synchronize) {
-            thread_lock_acquire(&st->rwlock);
-        }
-        st->name = name;
-        fclose(st->stream.filestream);
-        *(struct streaminfo *)&st->stream = (struct streaminfo) { .filestream = newfd, .mode = st->stream.mode };
-        if (st->synchronize) {
-            thread_lock_release(&st->rwlock);
-        }
+    } else if(NULL == name || NULL == mode) {
+#if SCRIBE_DEBUG
+        scrb_debug_write("Bad name or mode string.");
+#endif
+        errno = EINVAL;
+        goto error;
     }
-    return (SCRIBE_Success);
+    
+    if (st->synchronize) {
+        thread_lock_acquire(&st->rwlock);
+    }
+    int const newfiledes = fileno(newfilestream);
+    st->name = name;
+    fclose(st->stream.filestream);
+    *(struct streaminfo *)&st->stream = (struct streaminfo) { 
+                                            .filestream    = newfilestream,
+                                            .filedes       = newfiledes, 
+                                            .mode          = mode,
+                                        };
+    if (st->synchronize) {
+        thread_lock_release(&st->rwlock);
+    }
+
+    return (SCRB_Success);
 error:
-    return (SCRIBE_Failure);
+    return (SCRB_Failure);
 }
 
-void scrb_flush_stream__internal(scrb_stream * const st)
+extern
+int scrb_swap_filedes(struct scrb_stream * const st,
+                      int const newfiledes, 
+                      char const * const mode, 
+                      char const * const name)
+{
+    if (0 > newfiledes) {
+#if SCRIBE_DEBUG
+        scrb_debug_write("Bad file descriptor");
+#endif
+        errno = EINVAL;
+        goto error;
+    } else if (NULL == name || NULL == mode) {
+#if SCRIBE_DEBUG
+        scrb_debug_write("Bad name or mode string.");
+#endif
+        errno = EINVAL;
+        goto error;
+    }
+
+    if (st->synchronize) {
+        thread_lock_acquire(&st->rwlock);
+    }
+    FILE * const newfilestream = fdopen(newfiledes, mode);
+    st->name = name;
+    fclose(st->stream.filestream);
+    *(struct streaminfo *)&st->stream = (struct streaminfo) { 
+                                            .filestream    = newfilestream,
+                                            .filedes       = newfiledes, 
+                                            .mode          = mode,
+                                        };
+    if (st->synchronize) {
+        thread_lock_release(&st->rwlock);
+    }
+
+    return (SCRB_Success);
+error:
+    return (SCRB_Failure);
+}
+
+void scrb_flush_stream__internal(struct scrb_stream * const st)
 {
     if (NULL != st) {
         fflush(st->stream.filestream);

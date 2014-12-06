@@ -24,7 +24,7 @@
 
 // define at compile time (or before ``#include "scribe.h"``) if necessary.
 #ifndef SCRB_MAXMSGLEN
-#define SCRB_MAXMSGLEN (16 * SCRB_MSGBUFFCAPACITY)
+#define SCRB_MAXMSGLEN (4 * SCRB_MSGBUFFCAPACITY)
 #endif
 
 #define SCRB_BUFFCAPACITY 1024
@@ -32,9 +32,9 @@
 static
 char const * build_alloced(char const * const msgfmt, va_list ap)
 {
-    char * msg = NULL;
-    uint64_t retlen;
+    char * msg       = NULL;
     uint64_t trysize = SCRB_MSGBUFFCAPACITY;
+    uint64_t retlen;
     do {
         trysize *= 2;
         msg = realloc(msg, trysize * sizeof(char));
@@ -49,11 +49,40 @@ char const * build_alloced(char const * const msgfmt, va_list ap)
     return msg;
 }
 
-int scrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * const st,
-			             struct scrb_format const * const fmt, char const * const msg, bool const newline)
+int scrb_putstr__internal(struct scrb_stream * const st, char const * const msg, bool const newline)
+{
+    if(likely(msg != NULL)) {
+        if (st->synchronize) {
+            thread_lock_acquire(&st->rwlock);
+        }        
+        fputs(msg, st->stream.filestream);
+        if (newline) {
+            fputc('\n', st->stream.filestream);
+        }
+        if (st->synchronize) {
+            thread_lock_release(&st->rwlock);
+        }
+        return (SCRB_Success);
+    } else {
+#if SCRIBE_DEBUG
+        scrb_debug_write("NULL message string.");
+#endif
+        goto error;
+    }
+    return (SCRB_Success);
+error:
+    return (SCRB_Failure);
+}
+
+int scrb_write__internal(struct scrb_meta_info const mi, 
+                         struct scrb_stream * const st,
+			             struct scrb_format const * const fmt, 
+                         char const * const msg, 
+                         bool const newline)
 {
     char printbuff[SCRB_BUFFCAPACITY];
-    char const * const wrt = scrb_build_msg(mi, fmt, printbuff, SCRB_BUFFCAPACITY, msg, newline);
+    uint64_t msg_length    = 0;
+    char const * const wrt = scrb_build_msg(mi, fmt, printbuff, SCRB_BUFFCAPACITY, msg, &msg_length, newline);
     
     if (unlikely(NULL == wrt)) {
 #if SCRIBE_DEBUG
@@ -63,13 +92,13 @@ int scrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * con
     }
     
     if (st->synchronize) {
-        thread_lock_acquire((spinlock_t *)&st->rwlock);
+        thread_lock_acquire(&st->rwlock);
     }
 
     int const rc = fputs(wrt, st->stream.filestream);
     
     if (st->synchronize) {
-        thread_lock_release((spinlock_t *)&st->rwlock);
+        thread_lock_release(&st->rwlock);
     }
    
     // the message builder had to allocate space,
@@ -78,22 +107,25 @@ int scrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * con
         free((void *) wrt);
     }
 
-    return rc != EOF ? (SCRIBE_Success) : (SCRIBE_Failure);
+    return rc != EOF ? (SCRB_Success) : (SCRB_Failure);
 error:
-    return (SCRIBE_Failure);
+    return (SCRB_Failure);
 }
 
-int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * const st,
-                          struct scrb_format const * const fmt, char const * const msgfmt, 
-                          bool const newline, va_list ap)
+int fscrb_write__internal(struct scrb_meta_info const mi, 
+                          struct scrb_stream * const st,
+                          struct scrb_format const * const fmt, 
+                          char const * const msgfmt, 
+                          bool const newline, 
+                          va_list ap)
 {
-    bool usebuff = true;
+    bool usebuff          = true;
     char const * msgalloc = NULL;
 	char msgbuff[SCRB_MSGBUFFCAPACITY];
     uint64_t const retlen = vsnprintf(msgbuff, SCRB_MSGBUFFCAPACITY, msgfmt, ap);
 
 	if (unlikely(retlen >= SCRB_MSGBUFFCAPACITY)) {
-	    usebuff = false;
+	    usebuff  = false;
         msgalloc = build_alloced(msgfmt, ap);
         if (NULL == msgalloc) {
  #if SCRIBE_DEBUG
@@ -106,29 +138,30 @@ int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * co
  
     char printbuff[SCRB_BUFFCAPACITY];
     char const * wrt;
+    uint64_t msg_length = 0;
     
     if (likely(usebuff)) {
-        wrt = scrb_build_msg(mi, fmt, printbuff, SCRB_BUFFCAPACITY, msgbuff, newline);
+        wrt = scrb_build_msg(mi, fmt, printbuff, SCRB_BUFFCAPACITY, msgbuff, &msg_length, newline);
     } else {
-        wrt = scrb_build_msg(mi, fmt, printbuff, SCRB_BUFFCAPACITY, msgalloc, newline);
+        wrt = scrb_build_msg(mi, fmt, printbuff, SCRB_BUFFCAPACITY, msgalloc, &msg_length, newline);
         free((void *) msgalloc);
     }
     
     if (unlikely(NULL == wrt)) {
 #if SCRIBE_DEBUG
-        scrb_debug_write("Failed to build write string, length was %llu", strlen(wrt));
+        scrb_debug_write("Failed to build write string, length was.");
 #endif
         goto error;
     }
 
     if (st->synchronize) {
-        thread_lock_acquire((spinlock_t *)&st->rwlock);
+        thread_lock_acquire(&st->rwlock);
     }
     
     int const rc = fputs(wrt, st->stream.filestream);
-    
+ 
     if (st->synchronize) {
-        thread_lock_release((spinlock_t *)&st->rwlock);
+        thread_lock_release(&st->rwlock);
     }
 	
     // the message builder had to allocate space,
@@ -137,9 +170,9 @@ int fscrb_write__internal(struct scrb_meta_info const mi, scrb_stream const * co
         free((void *) wrt);
     }
 
-    return rc != EOF ? (SCRIBE_Success) : (SCRIBE_Failure);
+    return rc != EOF ? (SCRB_Success) : (SCRB_Failure);
 error:
-	return (SCRIBE_Failure);
+	return (SCRB_Failure);
 }
 
 #undef SCRB_MSGBUFFCAPACITY

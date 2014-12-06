@@ -22,76 +22,95 @@ extern "C" {
 
 #include "scribe_conf.h"
 #include "scribe_types.h"
+#include "scribe_ringbuff.h"
 #include "spinlock.h"
 
+#if defined(SCRIBE_WINDOWS)
+#include "Windows.h"
+#endif
+
 struct streaminfo {
-    FILE * filestream;
-    char const * mode;
+    char const * const mode;
+    FILE * const filestream;
+    int const filedes;
 };
 
 struct scrb_stream {
 	char const * name;
     bool const synchronize;
-    struct streaminfo const stream;
+    struct streaminfo stream;
     spinlock_t rwlock;
 };
 
-typedef struct scrb_stream scrb_stream;
+struct scrb_stream stream_out_default;
 
-scrb_stream const stream_out_default;
+struct scrb_stream stream_in_default;
 
-scrb_stream const stream_in_default;
-
-scrb_stream const stream_err_default;
+struct scrb_stream stream_err_default;
 
 #if SCRIBE_DEBUG
-scrb_stream const scrb_dbg_default;
+struct scrb_stream scrb_dbg_default;
 #endif
 
 static inline
-void scrb_init_defaults(scrb_stream const * const outstream,
-                        scrb_stream const * const instream,
-                        scrb_stream const * const errstream, ...)
+void scrb_init_defaults(struct scrb_stream * const outstream,
+                        struct scrb_stream * const instream,
+                        struct scrb_stream * const errstream, ...)
 {
-    static volatile int initialized = 0;
 #if defined(SCRIBE_WINDOWS)
+    static volatile LONG initialized = 0;
     if (0 == InterlockedCompareExchange(&initialized, 1, 0)) {
 #else    
+    static volatile int initialized = 0;
     if (__sync_bool_compare_and_swap(&initialized, 0, 1)) {
 #endif
-        memcpy((void *)&stream_out_default, outstream, sizeof(scrb_stream));
-        memcpy((void *)&stream_in_default, instream, sizeof(scrb_stream));
-        memcpy((void *)&stream_err_default, errstream, sizeof(scrb_stream));
+        memcpy(&stream_out_default, outstream, sizeof(struct scrb_stream));
+        memcpy(&stream_in_default, instream, sizeof(struct scrb_stream));
+        memcpy(&stream_err_default, errstream, sizeof(struct scrb_stream));
 #if SCRIBE_DEBUG
         va_list ap;
         va_start (ap, errstream);
-        scrb_stream const * const dbgstream = va_arg(ap, scrb_stream *);
-        memcpy((void *)&scrb_dbg_default, dbgstream, sizeof(scrb_stream));
+        struct scrb_stream * const dbgstream = va_arg(ap, struct scrb_stream *);
+        memcpy(&scrb_dbg_default, dbgstream, sizeof(struct scrb_stream));
         va_end (ap); 
 #endif
     }
 }
 
 static inline
-char const * scrb_stream_name__internal(scrb_stream const * const st)
+char const * scrb_stream_name__internal(struct scrb_stream const * const st)
 {
     return (NULL == st ? NULL : st->name);
 }
 
 extern
-scrb_stream * scrb_open_stream__internal(char const * const path, char const * const mode, bool const synchronize);
+struct scrb_stream * scrb_open_stream__internal(char const * const path, 
+                                                char const * const mode, 
+                                                bool const synchronize, 
+                                                bool const usebuffer);
 
 extern
-void scrb_close_stream__internal(scrb_stream ** streamptr);
+void scrb_close_stream__internal(struct scrb_stream ** streamptr);
 
 extern
-int scrb_swap_filepath(scrb_stream * const st, char const * const newfilepath);
+int scrb_swap_filepath(struct scrb_stream * const st, 
+                       char const * const newfilepath, 
+                       char const * const mode);
 
 extern
-int scrb_swap_filedes(scrb_stream * const st, FILE * const newfd, char const * const name);
+int scrb_swap_filestream(struct scrb_stream * const st, 
+                         FILE * const newfilestream, 
+                         char const * const mode, 
+                         char const * const name);
 
 extern
-void scrb_flush_stream__internal(scrb_stream * const st);
+int scrb_swap_filedes(struct scrb_stream * const st, 
+                      int const newfiledes, 
+                      char const * const mode, 
+                      char const * const name);
+
+extern
+void scrb_flush_stream__internal(struct scrb_stream * const st);
 
 #ifdef __cplusplus
 }

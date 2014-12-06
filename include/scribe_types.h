@@ -14,8 +14,8 @@ extern "C" {
 #endif
 
 enum scrb_return {
-	SCRIBE_Success = 0,
-	SCRIBE_Failure = 1
+	SCRB_Success = 0,
+	SCRB_Failure = 1
 };
 
 enum scrb_loglevel {

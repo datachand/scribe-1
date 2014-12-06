@@ -75,7 +75,8 @@ int main(void)
     }
     
     for (uint8_t th = 0; th < NthreadS; th += 1) {
-        args[th] = (struct thread_arg) { .thread_id = th, .logstream = log, .logfmt = fmt };
+        struct thread_arg tmp = { .thread_id = th, .logstream = log, .logfmt = fmt };
+        memcpy(args + th, &tmp, sizeof(struct thread_arg));
 #if SCRIBE_DEBUG
         scrb_debug_write("Spawning thread #%d", th);
 #endif

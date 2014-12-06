@@ -1,7 +1,7 @@
 # scribe
 
 ## Description
-A fast logging library for C. Note, most of the api is unstable at the moment.
+A fast and simple stream based logging library for C. Note, most of the api is unstable at the moment.
 
 Author: Dalton Woodard
 
@@ -13,6 +13,7 @@ Contact: daltonmwoodard@gmail.com
 #include <stdio.h>
 #include <stdlib.h>
 #include "scribe.h"
+
 int main(void)
 {
     if (SCRB_Success != scrb_init()) {

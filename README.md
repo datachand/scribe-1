@@ -7,6 +7,42 @@ Author: Dalton Woodard
 
 Contact: daltonmwoodard@gmail.com
 
+## Example usage
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include "scribe.h"
+int main(void)
+{
+    if (SCRB_Success != scrb_init()) {
+        exit(EXIT_FAILURE);
+    }
+
+    // We make open a new file called `example.log` in write mode without synchronization
+    // or buffered IO.
+    struct scrb_stream * const logstream = scrb_open_stream("example.log", "w", false, false);
+    
+    // We define a log format to tell scribe how to format our messages.
+    // This format prints out the file, method, and line locations followed by the message itself.
+    struct scrb_format * scrb_create_format("[%F:%L:%M] %m", NULL);
+
+    // Now we're ready to go.
+    scrb_writeln(logstream, fmt, "Hello from the example program!");
+
+    // We can do formatted output as well.
+    fscrb_writeln(logstream, fmt, "Hello for the %dnd time!", 2);
+
+    // If we want to write directly to the file without formatting or location/time info
+    // we can use the `scrb_putstrln` method.
+    scrb_putstrln(logstream, "Now we're done.");
+
+    scrb_format_release(fmt);
+    scrb_close_stream(logstream);
+    return 0;
+}
+```
+
 ## License
 MIT License (MIT)
 

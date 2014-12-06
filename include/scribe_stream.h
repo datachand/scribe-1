@@ -92,6 +92,10 @@ struct scrb_stream * scrb_open_stream__internal(char const * const path,
 extern
 void scrb_close_stream__internal(struct scrb_stream ** streamptr);
 
+// currently doesn't build with gcc, need to find a better way
+// to swap info on the stream instream of casting away const (because that's
+// as bad as it gets)
+/*
 extern
 int scrb_swap_filepath(struct scrb_stream * const st, 
                        char const * const newfilepath, 
@@ -108,7 +112,7 @@ int scrb_swap_filedes(struct scrb_stream * const st,
                       int const newfiledes, 
                       char const * const mode, 
                       char const * const name);
-
+*/
 extern
 void scrb_flush_stream__internal(struct scrb_stream * const st);
 

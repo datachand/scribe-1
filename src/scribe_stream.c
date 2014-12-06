@@ -108,7 +108,8 @@ void scrb_close_stream__internal(struct scrb_stream ** streamptr)
 	}
 }
 
-int scrb_swap_filepath(struct scrb_stream * const st, 
+// Currently doesn't build with gcc 49
+/*int scrb_swap_filepath(struct scrb_stream * const st, 
                        char const * const newfilepath, 
                        char const * const mode)
 {
@@ -226,7 +227,7 @@ int scrb_swap_filedes(struct scrb_stream * const st,
 error:
     return (SCRB_Failure);
 }
-
+*/
 void scrb_flush_stream__internal(struct scrb_stream * const st)
 {
     if (NULL != st) {

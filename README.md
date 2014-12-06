@@ -1,8 +1,7 @@
 # scribe
 
 ## Description
-A fast logging library for C. Note, this project is nowhere near complete and most of the api is unstable at
-the moment.
+A fast logging library for C. Note, most of the api is unstable at the moment.
 
 Author: Dalton Woodard
 

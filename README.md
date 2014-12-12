@@ -5,6 +5,9 @@ A fast and simple stream based logging library for C. Note, most of the api is u
 
 Currently scribe is known to build successfully on OS X with clang-600.0.56 and gcc 4.9.2.
 
+Running `make` at the command line defaults to producing a static library `build/libscribe.a`,
+see `Makefile` for more details.
+
 Author: Dalton Woodard
 
 Contact: daltonmwoodard@gmail.com

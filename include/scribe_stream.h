@@ -38,7 +38,7 @@ struct scrb_stream {
 	char const * name;
     bool const synchronize;
     struct streaminfo stream;
-    spinlock_t rwlock;
+    struct spinlock rwlock;
 };
 
 struct scrb_stream stream_out_default;

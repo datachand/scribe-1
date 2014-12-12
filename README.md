@@ -51,7 +51,7 @@ int main(void)
 ```
 
 ## Benchmarks
-All tests listed here were run on OS X 10.10.1 with 2.5 Ghz 2-core Intel i5.
+All tests listed here were run on OS X 10.10.1 with 2.5 GHz 2-core Intel i5.
 
 - Unsynchronized Throughput: 1,000,000 log messages written by a single thread (see `examples/throughput.c`):
 ```

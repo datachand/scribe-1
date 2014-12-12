@@ -71,8 +71,6 @@ sys     0m0.796s
 ```
 
 ## License
-All tests listed here were run on OS X 10.10.1 with 2.5 GHz 2-core Intel i5.
-
 Copyright (c) 2014 Dalton M. Woodard
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated

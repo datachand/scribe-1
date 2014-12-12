@@ -26,7 +26,6 @@ extern "C" {
 #include "scribe_types.h"
 #include "scribe_format.h"
 #include "scribe_utils.h"
-#include "scribe_ringbuff.h"
 #include "spinlock.h"
 
 #if defined(SCRIBE_WINDOWS)

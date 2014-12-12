@@ -33,8 +33,8 @@ void * threadlog(void * arg)
     (void) id;
     (void) fmt;
     for (uint64_t i = 0; i < NREPEATS; i += 1) {
-        scrb_flogln(st, fmt, "thread %d writing to the log -- #%d", id, i);
-        //scrb_logln(st, fmt, "thread writing to the log");
+        //scrb_flogln(st, fmt, "thread %d writing to the log -- #%d", id, i);
+        scrb_logln(st, fmt, "thread writing to the log");
     }
 
     return NULL;

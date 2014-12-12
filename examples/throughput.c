@@ -30,11 +30,11 @@ int main(void)
         scrb_format_release(&fmt);
         exit (EXIT_FAILURE);
     }
-    (void) fmt; 
+    
     for (uint64_t i = 0; i < NREPEATS; i += 1) {
         //fscrb_logln(log, fmt, "This writes to the log file %s #%d", "test", i);
-        //scrb_logln(log, fmt, "This writes to the log file.");
-        scrb_putstr(log, "This writes to the log file.");
+        scrb_logln(log, fmt, "This writes to the log file.");
+        //scrb_putstr(log, "This writes to the log file.");
     }
 
     scrb_close_stream(&log);

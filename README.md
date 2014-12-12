@@ -9,6 +9,11 @@ Author: Dalton Woodard
 
 Contact: daltonmwoodard@gmail.com
 
+## TODO
+- Add asynchronous queuing for stream objects to reduce time spent in blocking IO calls.
+
+- Add rule/level based logging option to broadcast messages to several streams at once (i.e., the syslog model).
+
 ## Example usage
 
 ```c
@@ -45,8 +50,28 @@ int main(void)
 }
 ```
 
+## Benchmarks
+All tests listed here were run on OS X 10.10.1 with 2.5 Ghz 2-core Intel i5.
+
+- Unsynchronized Throughput: 1,000,000 log messages written by a single thread (see `examples/throughput.c`):
+```
+$ ./examples/throughput
+real    0m0.522s
+user    0m0.402s
+sys     0m0.099s
+```
+
+- Synchronized Throughput: 1,000,000 log messages written each by 4 threads to the same file (see
+  `examples/synchronized/c`). Notice the sub-linear performance by increasing number of threads compared to above:
+```
+$ ./examples/synchronized
+real    0m1.942s
+user    0m5.739s
+sys     0m0.796s
+```
+
 ## License
-MIT License (MIT)
+All tests listed here were run on OS X 10.10.1 with 2.5 GHz 2-core Intel i5.
 
 Copyright (c) 2014 Dalton M. Woodard
 

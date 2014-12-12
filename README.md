@@ -14,6 +14,26 @@ Contact: daltonmwoodard@gmail.com
 
 - Add rule/level based logging option to broadcast messages to several streams at once (i.e., the syslog model).
 
+## Benchmarks
+All tests listed here were run on OS X 10.10.1 with 2.5 GHz 2-core Intel i5.
+
+- Unsynchronized Throughput: 1,000,000 log messages written by a single thread (see `examples/throughput.c`):
+```
+$ ./examples/throughput
+real    0m0.522s
+user    0m0.402s
+sys     0m0.099s
+```
+
+- Synchronized Throughput: 1,000,000 log messages written each by 4 threads to the same file (see
+  `examples/synchronized.c`). Notice the sub-linear performance by increasing number of threads compared to above:
+```
+$ ./examples/synchronized
+real    0m1.942s
+user    0m5.739s
+sys     0m0.796s
+```
+
 ## Example usage
 
 ```c
@@ -50,25 +70,14 @@ int main(void)
 }
 ```
 
-## Benchmarks
-All tests listed here were run on OS X 10.10.1 with 2.5 GHz 2-core Intel i5.
+Currently available log format information includes:
 
-- Unsynchronized Throughput: 1,000,000 log messages written by a single thread (see `examples/throughput.c`):
-```
-$ ./examples/throughput
-real    0m0.522s
-user    0m0.402s
-sys     0m0.099s
-```
-
-- Synchronized Throughput: 1,000,000 log messages written each by 4 threads to the same file (see
-  `examples/synchronized.c`). Notice the sub-linear performance by increasing number of threads compared to above:
-```
-$ ./examples/synchronized
-real    0m1.942s
-user    0m5.739s
-sys     0m0.796s
-```
+- File location
+- Method location
+- Line location
+- Process ID
+- Time (requires providing a callback to format time output)
+- Stream name
 
 ## License
 Copyright (c) 2014 Dalton M. Woodard

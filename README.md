@@ -24,7 +24,7 @@ file as well.
 - Add rule/level based logging option to broadcast messages to several streams at once (i.e., the syslog model).
 
 ## Benchmarks
-All tests listed here were run on OS X 10.10.1 with 2.5 GHz 2-core Intel i5.
+All tests listed here were run on OS X 10.10.1 with 2.5 GHz 2-core Intel i5 and compiled with clang-600.0.56.
 
 - Unsynchronized Throughput: 1,000,000 log messages written by a single thread (see `examples/throughput.c`):
 ```

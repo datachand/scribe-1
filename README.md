@@ -3,16 +3,20 @@
 ## Description
 A fast and simple stream based logging library for C. Note, most of the api is unstable at the moment.
 
-Currently scribe is known to build successfully on OS X with clang-600.0.56 and gcc 4.9.2.
-
-Running `make` at the command line defaults to producing a static library `build/libscribe.a`,
-see `Makefile` for more details.
-
 Author: Dalton Woodard
 
 Contact: daltonmwoodard@gmail.com
 
-## TODO
+## Info
+Currently scribe is known to build successfully on OS X with clang-600.0.56 and gcc 4.9.2.
+
+Running `make` at the command line defaults to producing a static library `build/libscribe.a`. I won't be providing a
+`make install` option or a dynamic (`.so`) library until the project is stable. See `Makefile` for more details.
+
+If you wish to clone the project, make sure to run `git clone --recursive` in order to pull in the `spinlock.h` header
+file as well.
+
+## Todo
 - Add asynchronous queuing for stream objects to reduce time spent in blocking IO calls.
 
 - Add rule/level based logging option to broadcast messages to several streams at once (i.e., the syslog model).

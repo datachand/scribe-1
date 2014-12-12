@@ -19,6 +19,8 @@ file as well.
 ## Todo
 - Add asynchronous queuing for stream objects to reduce time spent in blocking IO calls.
 
+- Add positional arguments for formatted log messages.
+
 - Add rule/level based logging option to broadcast messages to several streams at once (i.e., the syslog model).
 
 ## Benchmarks

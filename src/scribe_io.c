@@ -51,11 +51,12 @@ char const * build_alloced(char const * const msgfmt, va_list ap)
 
 int scrb_putstr__internal(struct scrb_stream * const st, char const * const msg, bool const newline)
 {
+    int ret = 0;
     if(likely(msg != NULL)) {
         if (st->synchronize) {
             thread_lock_acquire(&st->rwlock);
         }        
-        fputs(msg, st->stream.filestream);
+        ret = fputs(msg, st->stream.filestream);
         if (newline) {
             fputc('\n', st->stream.filestream);
         }
@@ -69,16 +70,16 @@ int scrb_putstr__internal(struct scrb_stream * const st, char const * const msg,
 #endif
         goto error;
     }
-    return (SCRB_Success);
+    return (ret != EOF ? SCRB_Success : SCRB_Failure);
 error:
     return (SCRB_Failure);
 }
 
-int scrb_write__internal(struct scrb_meta_info const mi, 
-                         struct scrb_stream * const st,
-			             struct scrb_format const * const fmt, 
-                         char const * const msg, 
-                         bool const newline)
+int scrb_log__internal(struct scrb_meta_info const mi, 
+                       struct scrb_stream * const st,
+			           struct scrb_format const * const fmt, 
+                       char const * const msg, 
+                       bool const newline)
 {
     char printbuff[SCRB_BUFFCAPACITY];
     uint64_t msg_length    = 0;
@@ -86,7 +87,7 @@ int scrb_write__internal(struct scrb_meta_info const mi,
     
     if (unlikely(NULL == wrt)) {
 #if SCRIBE_DEBUG
-        scrb_debug_write("Failed to build log message, message length was %llu", strlen(msg));
+        scrb_debug_write("Failed to build log message");
 #endif
         goto error;
     }
@@ -112,12 +113,12 @@ error:
     return (SCRB_Failure);
 }
 
-int fscrb_write__internal(struct scrb_meta_info const mi, 
-                          struct scrb_stream * const st,
-                          struct scrb_format const * const fmt, 
-                          char const * const msgfmt, 
-                          bool const newline, 
-                          va_list ap)
+int scrb_flog__internal(struct scrb_meta_info const mi, 
+                        struct scrb_stream * const st,
+                        struct scrb_format const * const fmt, 
+                        char const * const msgfmt, 
+                        bool const newline, 
+                        va_list ap)
 {
     bool usebuff          = true;
     char const * msgalloc = NULL;
@@ -149,7 +150,7 @@ int fscrb_write__internal(struct scrb_meta_info const mi,
     
     if (unlikely(NULL == wrt)) {
 #if SCRIBE_DEBUG
-        scrb_debug_write("Failed to build write string, length was.");
+        scrb_debug_write("Failed to build write string.");
 #endif
         goto error;
     }

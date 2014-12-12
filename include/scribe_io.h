@@ -26,19 +26,19 @@ extern
 int scrb_putstr__internal(struct scrb_stream * const st, char const * const msg, bool const newline);
 
 extern
-int scrb_write__internal(struct scrb_meta_info const mi, 
-                         struct scrb_stream * const st,
-			             struct scrb_format const * const fmt, 
-                         char const * const msg, 
-                         bool const newline);
+int scrb_log__internal(struct scrb_meta_info const mi, 
+                       struct scrb_stream * const st,
+			           struct scrb_format const * const fmt, 
+                       char const * const msg, 
+                       bool const newline);
 
 extern
-int fscrb_write__internal(struct scrb_meta_info const mi, 
-                          struct scrb_stream const * const st,
-                          struct scrb_format const * const fmt, 
-                          char const * const msgfmt, 
-                          bool const newline, 
-                          va_list ap);
+int scrb_flog__internal(struct scrb_meta_info const mi, 
+                        struct scrb_stream const * const st,
+                        struct scrb_format const * const fmt, 
+                        char const * const msgfmt, 
+                        bool const newline, 
+                        va_list ap);
 
 #ifdef __cplusplus
 }

@@ -22,7 +22,6 @@ extern "C" {
 
 #include "scribe_conf.h"
 #include "scribe_types.h"
-#include "scribe_ringbuff.h"
 #include "spinlock.h"
 
 #if defined(SCRIBE_WINDOWS)
@@ -86,8 +85,7 @@ char const * scrb_stream_name__internal(struct scrb_stream const * const st)
 extern
 struct scrb_stream * scrb_open_stream__internal(char const * const path, 
                                                 char const * const mode, 
-                                                bool const synchronize, 
-                                                bool const usebuffer);
+                                                bool const synchronize);
 
 extern
 void scrb_close_stream__internal(struct scrb_stream ** streamptr);

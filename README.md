@@ -22,19 +22,18 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    // We make open a new file called `example.log` in write mode without synchronization
-    // or buffered IO.
-    struct scrb_stream * const logstream = scrb_open_stream("example.log", "w", false, false);
+    // We make open a new file called `example.log` in write mode without synchronization.
+    struct scrb_stream * const logstream = scrb_open_stream("example.log", "w", false);
     
     // We define a log format to tell scribe how to format our messages.
     // This format prints out the file, method, and line locations followed by the message itself.
     struct scrb_format * scrb_create_format("[%F:%L:%M] %m", NULL);
 
     // Now we're ready to go.
-    scrb_writeln(logstream, fmt, "Hello from the example program!");
+    scrb_logln(logstream, fmt, "Hello from the example program!");
 
     // We can do formatted output as well.
-    fscrb_writeln(logstream, fmt, "Hello for the %dnd time!", 2);
+    scrb_flogln(logstream, fmt, "Hello for the %dnd time!", 2);
 
     // If we want to write directly to the file without formatting or location/time info
     // we can use the `scrb_putstrln` method.

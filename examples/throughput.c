@@ -25,15 +25,15 @@ int main(void)
     }
 
     // use the file "test.log" in write-only mode unsynchronized with buffered IO off.
-    struct scrb_stream * const log = scrb_open_stream("throughputtest.log", "w", false, false);
+    struct scrb_stream * const log = scrb_open_stream("throughputtest.log", "w", false);
     if (NULL == log) {
         scrb_format_release(&fmt);
         exit (EXIT_FAILURE);
     }
     (void) fmt; 
     for (uint64_t i = 0; i < NREPEATS; i += 1) {
-        //fscrb_writeln(log, fmt, "This writes to the log file %s #%d", "test", i);
-        //scrb_writeln(log, fmt, "This writes to the log file.");
+        //fscrb_logln(log, fmt, "This writes to the log file %s #%d", "test", i);
+        //scrb_logln(log, fmt, "This writes to the log file.");
         scrb_putstr(log, "This writes to the log file.");
     }
 

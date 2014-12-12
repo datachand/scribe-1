@@ -25,10 +25,8 @@
 
 struct scrb_stream * scrb_open_stream__internal(char const * const path, 
                                                 char const * const mode, 
-                                                bool const synchronize, 
-                                                bool const use_buffer)
+                                                bool const synchronize)
 {
-    (void) use_buffer;
 	if (NULL == path) {
 #if SCRIBE_DEBUG
 		scrb_debug_write("NULL path string.");

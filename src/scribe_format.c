@@ -43,6 +43,7 @@ struct scrb_format * scrb_create_format__internal(char const * const fmtstr,
 #if SCRIBE_DEBUG
         scrb_debug_write("Failed to duplicate format string.");
 #endif
+        errno = ENOMEM;
         goto error;
     }
 
@@ -81,6 +82,7 @@ struct scrb_format * scrb_create_format__internal(char const * const fmtstr,
 #if SCRIBE_DEBUG
                 scrb_debug_write("Unrecongnized format character '%c'", fmtchar);
 #endif
+                errno = EINVAL;
                 goto error;
             }
             tmp.numfmts += 1;

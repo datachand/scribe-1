@@ -6,6 +6,7 @@
 // License: Please see LICENSE.md
 //
 
+#include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -63,11 +64,11 @@ int scrb_putstr__internal(struct scrb_stream * const st, char const * const msg,
         if (st->synchronize) {
             thread_lock_release(&st->rwlock);
         }
-        return (SCRB_Success);
     } else {
 #if SCRIBE_DEBUG
         scrb_debug_write("NULL message string.");
 #endif
+        errno = EINVAL;
         goto error;
     }
     return (ret != EOF ? SCRB_Success : SCRB_Failure);
@@ -152,6 +153,7 @@ int scrb_flog__internal(struct scrb_meta_info const mi,
 #if SCRIBE_DEBUG
         scrb_debug_write("Failed to build write string.");
 #endif
+        errno = ENOMEM;
         goto error;
     }
 

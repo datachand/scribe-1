@@ -62,7 +62,7 @@ sys     0m0.099s
 ```
 
 - Synchronized Throughput: 1,000,000 log messages written each by 4 threads to the same file (see
-  `examples/synchronized/c`). Notice the sub-linear performance by increasing number of threads compared to above:
+  `examples/synchronized.c`). Notice the sub-linear performance by increasing number of threads compared to above:
 ```
 $ ./examples/synchronized
 real    0m1.942s

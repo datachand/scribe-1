@@ -1,7 +1,7 @@
 # scribe
 
 ## Description
-A fast and simple stream based logging library for C. Note, most of the api is unstable at the moment.
+A fast and simple stream based logging library for C. The API should be mostly stable from now on.
 
 Author: Dalton Woodard
 
@@ -19,27 +19,25 @@ file as well.
 ## Todo
 - Add asynchronous queuing for stream objects to reduce time spent in blocking IO calls.
 
-- Add positional arguments for formatted log messages.
-
 - Add rule/level based logging option to broadcast messages to several streams at once (i.e., the syslog model).
 
 ## Benchmarks
-All tests listed here were run on OS X 10.10.1 with 2.5 GHz 2-core Intel i5 and compiled with clang-600.0.56.
+All tests listed here were run on OS X 10.10.1 with 2.5 GHz 2-core Intel i5 and compiled with gcc 4.9.2.
 
 - Unsynchronized Throughput: 1,000,000 log messages written by a single thread (see `examples/throughput.c`):
 ```
 $ ./examples/throughput
-real    0m0.522s
-user    0m0.402s
-sys     0m0.099s
+real    0m0.463s
+user    0m0.355s
+sys     0m0.092s
 ```
 
 - Synchronized Throughput: 1,000,000 log messages written each by 4 threads to the same file (see
-  `examples/synchronized.c`). Notice the sub-linear performance by increasing number of threads compared to above:
+  `examples/synchronized.c`).
 ```
 $ ./examples/synchronized
-real    0m1.942s
-user    0m5.739s
+real    0m1.941s
+user    0m5.812s
 sys     0m0.796s
 ```
 

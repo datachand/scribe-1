@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 
+#define _POSIX_C_SOURCE 1
+
 #include "scribe_conf.h"
 
 #include <errno.h>

@@ -16,6 +16,7 @@ extern "C" {
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "scribe_conf.h"
 #include "scribe_stream.h"

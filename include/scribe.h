@@ -63,7 +63,7 @@ int scrb_init(void)
             .synchronize = true,
             .stream = {
                 .filestream = stdout,
-                .filedes    = fileno(stdout),
+                .filedes    = scrb_fileno(stdout),
             },
             .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
         };
@@ -73,7 +73,7 @@ int scrb_init(void)
             .synchronize = true,
             .stream = {
                 .filestream = stdin,
-                .filedes    = fileno(stdin),
+                .filedes    = scrb_fileno(stdin),
             },
             .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
         };
@@ -83,7 +83,7 @@ int scrb_init(void)
             .synchronize = true,
             .stream = {
                 .filestream = stderr,
-                .filedes    = fileno(stderr),
+                .filedes    = scrb_fileno(stderr),
             },
             .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY) 
         };
@@ -95,7 +95,7 @@ int scrb_init(void)
             .synchronize = true,
             .stream = {
                 .filestream = dbg_filestream,
-                .filedes    = fileno(dbg_filestream),
+                .filedes    = scrb_fileno(dbg_filestream),
             },
             .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
         };

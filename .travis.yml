@@ -1,0 +1,21 @@
+language: c
+compiler:
+    - clang
+    - gcc
+install:
+    - git submodule update --init --recursive
+branches:
+    only:
+        - master
+script:
+    - "echo debug build"
+    - make
+    - ./examples/throughput
+    - ./examples/synchronized
+    - make clean
+    - "echo regular build"
+    - make OPTFLAGS=-DNDEBUG
+    - ./examples/throughput
+    - ./examples/synchronized
+    - make clean
+    - "echo done"

@@ -1,7 +1,8 @@
 # scribe
 
 ## Description
-A fast and simple stream based logging library for C. The API should be mostly stable from now on.
+A fast and simple stream based logging library for C. The API should be mostly stable from now on. The current version
+of scribe is v0.1.0.
 
 Author: Dalton Woodard
 

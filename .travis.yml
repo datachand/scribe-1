@@ -8,14 +8,22 @@ branches:
     only:
         - master
 script:
-    - "echo debug build"
-    - make
+    - "echo debug build c11 standard"
+    - make std=c11
     - ./examples/throughput
-    - ./examples/synchronized
+    - tail scribedebug.log
     - make clean
-    - "echo regular build"
-    - make OPTFLAGS=-DNDEBUG
+    - "echo debug build c99 standard"
+    - make std=c99
     - ./examples/throughput
-    - ./examples/synchronized
+    - tail scribedebug.log
+    - make clean
+    - "echo regular build c11 standard"
+    - make std=c11 OPTFLAGS=-DNDEBUG
+    - ./examples/throughput
+    - make clean
+    - "echo regular build c11 standard"
+    - make std=c99 OPTFLAGS=-DNDEBUG
+    - ./examples/throughput
     - make clean
     - "echo done"

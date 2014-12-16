@@ -62,8 +62,8 @@ int scrb_init(void)
             .name        = "stdout",
             .synchronize = true,
             .stream = {
+                .mode       = NULL,
                 .filestream = stdout,
-                .filedes    = scrb_fileno(stdout),
             },
             .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
         };
@@ -72,8 +72,8 @@ int scrb_init(void)
             .name        = "stdin",
             .synchronize = true,
             .stream = {
+                .mode       = NULL,
                 .filestream = stdin,
-                .filedes    = scrb_fileno(stdin),
             },
             .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
         };
@@ -82,8 +82,8 @@ int scrb_init(void)
             .name        = "stderr",
             .synchronize = true,
             .stream = {
+                .mode       = NULL,
                 .filestream = stderr,
-                .filedes    = scrb_fileno(stderr),
             },
             .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY) 
         };
@@ -94,8 +94,8 @@ int scrb_init(void)
             .name        = "debug",
             .synchronize = true,
             .stream = {
+                .mode       = NULL,
                 .filestream = dbg_filestream,
-                .filedes    = scrb_fileno(dbg_filestream),
             },
             .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
         };

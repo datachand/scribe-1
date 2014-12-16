@@ -13,8 +13,6 @@
 extern "C" {
 #endif
 
-#define _POSIX_C_SOURCE 1
-
 #include "scribe_conf.h"
 
 #include <errno.h>
@@ -65,16 +63,6 @@ SCRIBE_PID_T scrb_getpid(void)
     return _getpid();
 #else
     return getpid();
-#endif
-}
-
-static inline
-int scrb_fileno(FILE * stream)
-{
-#if defined(SCRIBE_WINDOWS)
-    return _fileno(stream);
-#else
-    return fileno(stream);
 #endif
 }
 

@@ -31,7 +31,6 @@ extern "C" {
 struct streaminfo {
     char const * const mode;
     FILE * const filestream;
-    int const filedes;
 };
 
 struct scrb_stream {

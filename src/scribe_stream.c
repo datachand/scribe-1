@@ -49,14 +49,12 @@ struct scrb_stream * scrb_open_stream__internal(char const * const path,
 		goto error;
 	}
 	
-    int const fd = scrb_fileno(filestream);
     struct scrb_stream tmp = {
 		.name        = stringdup(path),
 		.synchronize = synchronize,
         .stream = {
-            .filestream = filestream,
-            .filedes    = fd,
             .mode       = mode,
+            .filestream = filestream,
         },
         .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
 	};

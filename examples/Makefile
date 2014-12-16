@@ -19,8 +19,7 @@ dbg_flags?=-g0
 cflags=-std=$(std) $(opt_flags) $(dbg_flags) -Werror -Wall -Wextra -Wformat=2 -Wshadow \
 	   -Wwrite-strings -Wstrict-prototypes -Wold-style-definition -Wredundant-decls \
 	   -Wnested-externs -Wmissing-include-dirs -Wcast-align -Wmissing-include-dirs \
-	   -Wswitch-default -Wno-unused-function -Wno-gnu-zero-variadic-macro-arguments \
-	   -Wno-format-nonliteral
+	   -Wswitch-default -Wno-unused-function -Wno-format-nonliteral
 iflags=-I$(include_dir) -I$(submodules_dir)/spinlock/include
 lflags=-L$(biuld_dir)
 

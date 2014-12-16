@@ -18,6 +18,7 @@ extern "C" {
 #include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #ifdef SCRIBE_WINDOWS
 #include "Windows.h"
@@ -62,6 +63,16 @@ SCRIBE_PID_T scrb_getpid(void)
     return _getpid();
 #else
     return getpid();
+#endif
+}
+
+static inline
+int scrb_fileno(FILE * stream)
+{
+#if defined(SCRIBE_WINDOWS)
+    return _fileno(stream);
+#else
+    return fileno(stream);
 #endif
 }
 

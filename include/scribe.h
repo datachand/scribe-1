@@ -144,11 +144,10 @@ struct scrb_format * scrb_create_format(char const * const fmtstr,
 //
 //
 static inline
-void (scrb_format_release)(struct scrb_format ** fmtptr)
+void scrb_format_release(struct scrb_format ** fmtptr)
 {
     scrb_format_release_internal(fmtptr);
 }
-#define scrb_format_release(fmtptr) (scrb_format_release)((fmtptr))
 
 // `scrb_stream_name`
 // doc...
@@ -180,11 +179,10 @@ struct scrb_stream * scrb_open_stream(char const * const path,
 // `scribe_close`
 // doc...
 static inline
-void (scrb_close_stream)(struct scrb_stream ** streamptr)
+void scrb_close_stream(struct scrb_stream ** streamptr)
 {
     scrb_close_stream_internal(streamptr);
 }
-#define scrb_close_stream(streamptr) (scrb_close_stream)((streamptr))
 
 // `scribe_flush_stream`
 // doc...

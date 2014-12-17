@@ -2,7 +2,8 @@
 [![Build Status](https://travis-ci.org/daltonwoodard/scribe.svg?branch=master)](https://travis-ci.org/daltonwoodard/sorting)
 
 ## Description
-A fast and simple stream based logging library for C. The API should be mostly stable from now on. The current version
+A fast and simple stream based logging library for C. The API should be mostly stable from now on. Almost all planned features of 
+scribe are now implemented, so the majority of changes to come will be bug fixes and unit tests.  The current version
 of scribe is v0.1.0.
 
 Author: Dalton Woodard
@@ -25,7 +26,7 @@ file as well.
 ## Todo
 - Add asynchronous queuing for stream objects to reduce time spent in blocking IO calls.
 
-- Add rule/level based logging option to broadcast messages to several streams at once (i.e., the syslog model).
+- Finish documentation.
 
 ## Benchmarks
 All tests listed here were run on OS X 10.10.1 with 2.5 GHz 2-core Intel i5 and compiled with gcc 4.9.2.

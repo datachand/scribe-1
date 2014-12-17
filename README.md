@@ -14,7 +14,7 @@ Currently scribe is known to build successfully on:
 
 - OS X 10.10.1 with clang-600.0.56 and gcc 4.9.2 against the ISO c11 and c99 standards.
 
-- Ubuntu with clang-
+- Ubuntu 12.04 with clang 3.4 against the ISO c11 and c99 standards and gcc 4.6.3 against the ISO c99 standard.
 
 Running `make` at the command line defaults to producing a static library `build/libscribe.a`. I won't be providing a
 `make install` option or a dynamic (`.so`) library until the project is stable. See `Makefile` for more details.

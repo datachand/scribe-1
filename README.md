@@ -87,12 +87,13 @@ int main(void)
 
 Currently available log format information includes:
 
-- File location
-- Method location
-- Line location
-- Process ID
-- Time (requires providing a callback to format time output)
-- Stream name
+- File location (`%F`)
+- Method location (`%M`)
+- Line location (`%L`)
+- Process ID (`%p`)
+- Time (requires providing a callback to format time output) (`%p`)
+- Stream name (`%n`)
+- Severity level (`%s`)
 
 ## License
 Copyright (c) 2014 Dalton M. Woodard

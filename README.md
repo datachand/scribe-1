@@ -67,7 +67,7 @@ int main(void)
     
     // We define a log format to tell scribe how to format our messages.
     // This format prints out the file, method, and line locations followed by the message itself.
-    struct scrb_format * scrb_create_format("[%F:%L:%M] %m", NULL);
+    struct scrb_format const * const fmt = scrb_create_format("[%F:%L:%M] %m", NULL);
 
     // Now we're ready to go.
     scrb_logln(logstream, fmt, LVL_INFO, "Hello from the example program!");

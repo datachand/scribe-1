@@ -38,5 +38,6 @@ make std=c99 OPTFLAGS=-DNDEBUG;
 if [[ runprogs -ne 0 ]]; then exit 1; fi;
 make clean;
 
+echo "build successful";
 exit 0;
 

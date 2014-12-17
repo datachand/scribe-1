@@ -79,8 +79,8 @@ int main(void)
     // (or paying attention to log levels) we can use the `scrb_putstrln` method to write directly to the file.
     scrb_putstrln(logstream, "Now we're done.");
 
-    scrb_format_release(fmt);
-    scrb_close_stream(logstream);
+    scrb_format_release(&fmt);
+    scrb_close_stream(&logstream);
     return EXIT_SUCCESS;
 }
 ```

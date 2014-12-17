@@ -9,10 +9,6 @@
 #ifndef SCRIBE_METAINFO_H
 #define SCRIBE_METAINFO_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "scribe_conf.h"
 
 #include <stdint.h>
@@ -27,6 +23,10 @@ extern "C" {
 #endif
 
 #include "scribe_return_types.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct scrb_meta_info {
     char const * const streamname;

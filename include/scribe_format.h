@@ -9,10 +9,6 @@
 #ifndef SCRIBE_FORMAT_H
 #define SCRIBE_FORMAT_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
 #include <stdlib.h>
 #include "scribe_conf.h"
@@ -21,6 +17,10 @@ extern "C" {
 #include "Windows.h"
 #else
 #include <sys/time.h>
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 typedef enum {
@@ -50,13 +50,13 @@ struct scrb_format {
 };
 
 extern
-struct scrb_format * scrb_create_format__internal(char const * const fmtstr, 
+struct scrb_format * scrb_create_format_internal(char const * const fmtstr, 
                                                   void (*timehook)(char ** buff, 
                                                                    size_t * len, 
                                                                    SCRIBE_TIME_T ts));
 
 extern
-void scrb_format_release__internal(struct scrb_format ** fmtptr);
+void scrb_format_release_internal(struct scrb_format ** fmtptr);
 
 #ifdef __cplusplus
 }

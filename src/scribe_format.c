@@ -24,7 +24,7 @@
 #include <sys/time.h>
 #endif
 
-struct scrb_format * scrb_create_format__internal(char const * const fmtstr, 
+struct scrb_format * scrb_create_format_internal(char const * const fmtstr, 
                                                   void (*timehook)(char ** buff, 
                                                                    size_t * len, 
                                                                    SCRIBE_TIME_T ts))
@@ -102,7 +102,11 @@ struct scrb_format * scrb_create_format__internal(char const * const fmtstr,
     tmp.fmttypes = malloc(tmp.numfmts * sizeof(fmttype));
     memcpy(tmp.fmttypes, tmp_fmttypes, tmp.numfmts * sizeof(fmttype));
 
+#if defined(__cplusplus)
+    struct scrb_format * result = (struct scrb_format *) malloc(sizeof(struct scrb_format));
+#else
     struct scrb_format * result = malloc(sizeof(struct scrb_format));
+#endif
     memcpy(result, &tmp, sizeof(struct scrb_format));
     return result;
 }
@@ -110,7 +114,7 @@ error:
     return NULL;
 }
 
-void scrb_format_release__internal(struct scrb_format ** fmtptr)
+void scrb_format_release_internal(struct scrb_format ** fmtptr)
 {
     if (NULL != fmtptr && NULL != *fmtptr) {
         struct scrb_format * fmt = *fmtptr;

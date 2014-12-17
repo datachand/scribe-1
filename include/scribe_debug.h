@@ -9,10 +9,6 @@
 #ifndef SCRIBE_DEBUG_H
 #define SCRIBE_DEBUG_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #if !defined(NDEBUG)
 
 #include <stdarg.h>
@@ -23,6 +19,10 @@ extern "C" {
 #include "scribe_conf.h"
 #include "scribe_metainfo.h"
 #include "scribe_stream.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 static inline
 void (scrb_debug_write)(struct scrb_meta_info const mi, char const * const msg, ...)
@@ -44,10 +44,10 @@ void (scrb_debug_write)(struct scrb_meta_info const mi, char const * const msg, 
 }
 #define scrb_debug_write(msg, ...) (scrb_debug_write)(get_meta_info(scrb_dbg_default.name), (msg), ##__VA_ARGS__)
 
-#endif
-
 #ifdef __cplusplus
 }
+#endif
+
 #endif
 
 #endif

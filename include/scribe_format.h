@@ -17,6 +17,12 @@ extern "C" {
 #include <stdlib.h>
 #include "scribe_conf.h"
 
+#if defined(SCRIBE_WINDOWS)
+#include "Windows.h"
+#else
+#include <sys/time.h>
+#endif
+
 typedef enum {
     FMT_UNKOWN = -1,
     FMT_FILE = 0,

@@ -18,6 +18,12 @@
 #include "scribe_format.h"
 #include "scribe_utils.h"
 
+#if defined(SCRIBE_WINDOWS)
+#include "Windows.h"
+#else
+#include <sys/time.h>
+#endif
+
 struct scrb_format * scrb_create_format__internal(char const * const fmtstr, 
                                                   void (*timehook)(char ** buff, 
                                                                    size_t * len, 

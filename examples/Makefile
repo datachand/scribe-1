@@ -9,7 +9,7 @@ include_dir=$(base)/include
 submodules_dir=$(base)/submodules
 
 sources=$(wildcard *.c)
-dep=$(build_dir)/libscribe.a
+dep=$(build_dir)/libscribe.a -lpthread
 targets=$(basename $(sources))
 
 CC?=clang

@@ -9,10 +9,6 @@
 #ifndef SCRIBE_STREAM_H
 #define SCRIBE_STREAM_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -26,6 +22,10 @@ extern "C" {
 
 #if defined(SCRIBE_WINDOWS)
 #include "Windows.h"
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 struct streaminfo {
@@ -77,25 +77,25 @@ void scrb_init_defaults(struct scrb_stream * const outstream,
 }
 
 static inline
-char const * scrb_stream_name__internal(struct scrb_stream const * const st)
+char const * scrb_stream_name_internal(struct scrb_stream const * const st)
 {
     return st->name;
 }
 
 static inline
-uint16_t scrb_stream_severity__internal(struct scrb_stream const * const st)
+uint16_t scrb_stream_severity_internal(struct scrb_stream const * const st)
 {
     return st->severity;
 }
 
 extern
-struct scrb_stream * scrb_open_stream__internal(char const * const path, 
+struct scrb_stream * scrb_open_stream_internal(char const * const path, 
                                                 char const * const mode, 
                                                 bool const synchronize,
                                                 uint16_t const severity);
 
 extern
-void scrb_close_stream__internal(struct scrb_stream ** streamptr);
+void scrb_close_stream_internal(struct scrb_stream ** streamptr);
 
 // currently doesn't build with gcc, need to find a better way
 // to swap info on the stream instream of casting away const (because that's
@@ -119,7 +119,7 @@ int scrb_swap_filedes(struct scrb_stream * const st,
                       char const * const name);
 */
 extern
-void scrb_flush_stream__internal(struct scrb_stream * const st);
+void scrb_flush_stream_internal(struct scrb_stream * const st);
 
 #ifdef __cplusplus
 }

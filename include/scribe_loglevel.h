@@ -9,11 +9,11 @@
 #ifndef SCRIBE_LOGLEVEL_H
 #define SCRIBE_LOGLEVEL_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <stdint.h>
 
 enum scrb_loglevel {
     LVL_DEBUG  = (1 << 0),

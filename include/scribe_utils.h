@@ -9,10 +9,6 @@
 #ifndef SCRIBE_UTILS_H
 #define SCRIBE_UTILS_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "scribe_conf.h"
 
 #include <errno.h>
@@ -31,6 +27,10 @@ extern "C" {
 #include "scribe_format.h"
 #include "scribe_metainfo.h"
 #include "scribe_return_types.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 static inline
 char * stringdup(char const * const str)

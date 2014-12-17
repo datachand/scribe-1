@@ -9,10 +9,6 @@
 #ifndef SCRIBE_IO_H
 #define SCRIBE_IO_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdarg.h>
 #include <stdbool.h>
 
@@ -21,11 +17,15 @@ extern "C" {
 #include "scribe_stream.h"
 #include "scribe_utils.h"
 
-extern
-int scrb_putstr__internal(struct scrb_stream * const st, char const * const msg, bool const newline);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern
-int scrb_log__internal(struct scrb_meta_info const mi, 
+int scrb_putstr_internal(struct scrb_stream * const st, char const * const msg, bool const newline);
+
+extern
+int scrb_log_internal(struct scrb_meta_info const mi, 
                        struct scrb_stream * const st,
 			           struct scrb_format const * const fmt, 
                        uint16_t const severity,
@@ -33,7 +33,7 @@ int scrb_log__internal(struct scrb_meta_info const mi,
                        bool const newline);
 
 extern
-int scrb_flog__internal(struct scrb_meta_info const mi, 
+int scrb_flog_internal(struct scrb_meta_info const mi, 
                         struct scrb_stream const * const st,
                         struct scrb_format const * const fmt,
                         uint16_t const severity, 

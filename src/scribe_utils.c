@@ -24,8 +24,13 @@
 static inline
 char * reallocstr(char * str, bool const build_string_allocated, uint64_t const newcap)
 {
+#if defined(__cplusplus)
+    return (build_string_allocated ? (char *) realloc(str, newcap * sizeof(char)) 
+                                   : (char *) malloc(newcap * sizeof(char)));
+#else
     return (build_string_allocated ? realloc(str, newcap * sizeof(char)) 
                                    : malloc(newcap * sizeof(char)));
+#endif
 }
 
 static inline

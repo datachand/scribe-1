@@ -38,7 +38,11 @@ char const * build_alloced(char const * const msgfmt, va_list ap)
     uint64_t retlen;
     do {
         trysize *= 2;
+#if defined(__cplusplus)
+        msg = (char *) realloc(msg, trysize * sizeof(char));
+#else
         msg = realloc(msg, trysize * sizeof(char));
+#endif   
         if (NULL == msg) {
             break;
         }
@@ -50,7 +54,7 @@ char const * build_alloced(char const * const msgfmt, va_list ap)
     return msg;
 }
 
-int scrb_putstr__internal(struct scrb_stream * const st, char const * const msg, bool const newline)
+int scrb_putstr_internal(struct scrb_stream * const st, char const * const msg, bool const newline)
 {
     int ret = 0;
     if(likely(msg != NULL)) {
@@ -76,7 +80,7 @@ error:
     return (SCRB_Failure);
 }
 
-int scrb_log__internal(struct scrb_meta_info const mi, 
+int scrb_log_internal(struct scrb_meta_info const mi, 
                        struct scrb_stream * const st,
                        struct scrb_format const * const fmt, 
                        uint16_t const severity,
@@ -115,7 +119,7 @@ error:
     return (SCRB_Failure);
 }
 
-int scrb_flog__internal(struct scrb_meta_info const mi, 
+int scrb_flog_internal(struct scrb_meta_info const mi, 
                         struct scrb_stream * const st,
                         struct scrb_format const * const fmt, 
                         uint16_t const severity,

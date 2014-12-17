@@ -9,10 +9,6 @@
 #ifndef SCRIBE_H
 #define SCRIBE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -32,6 +28,10 @@ extern "C" {
 
 #if defined(SCRIBE_WINDOWS)
 #include "Windows.h"
+#endif
+
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 #define LVL_TO_DEBUG  (LVL_DEBUG)
@@ -70,34 +70,34 @@ int scrb_init(void)
     static volatile int initialized = 0;
     if (__sync_bool_compare_and_swap(&initialized, 0, 1)) {
 #endif
-        struct scrb_stream outstream = (struct scrb_stream) {
+        struct scrb_stream outstream = {
             .name        = "stdout",
             .synchronize = true,
             .severity    = LVL_ALL, 
             .stream = {
-                .mode       = NULL,
+                .mode       = "a",
                 .filestream = stdout,
             },
             .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
         };
 
-        struct scrb_stream instream = (struct scrb_stream) {
+        struct scrb_stream instream = {
             .name        = "stdin",
             .synchronize = true,
             .severity    = LVL_ALL,
             .stream = {
-                .mode       = NULL,
+                .mode       = "a",
                 .filestream = stdin,
             },
             .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
         };
 
-        struct scrb_stream errstream = (struct scrb_stream) {
+        struct scrb_stream errstream = {
             .name        = "stderr",
             .synchronize = true,
             .severity    = LVL_ALL,
             .stream = {
-                .mode       = NULL,
+                .mode       = "a",
                 .filestream = stderr,
             },
             .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY) 
@@ -105,7 +105,7 @@ int scrb_init(void)
 
 #if SCRIBE_DEBUG
         FILE * const dbg_filestream = fopen("scribedebug.log", "a");
-        struct scrb_stream dbgstream = (struct scrb_stream) {
+        struct scrb_stream dbgstream = {
             .name        = "debug",
             .synchronize = true,
             .severity    = LVL_ALL,
@@ -138,7 +138,7 @@ struct scrb_format * scrb_create_format(char const * const fmtstr,
                                                          size_t * len, 
                                                          SCRIBE_TIME_T ts))
 {
-    return scrb_create_format__internal(fmtstr, timehook);
+    return scrb_create_format_internal(fmtstr, timehook);
 }
 
 //
@@ -146,16 +146,16 @@ struct scrb_format * scrb_create_format(char const * const fmtstr,
 static inline
 void (scrb_format_release)(struct scrb_format ** fmtptr)
 {
-    scrb_format_release__internal(fmtptr);
+    scrb_format_release_internal(fmtptr);
 }
-#define scrb_format_release(fmtptr) (scrb_format_release)((struct scrb_format **) (fmtptr))
+#define scrb_format_release(fmtptr) (scrb_format_release)((fmtptr))
 
 // `scrb_stream_name`
 // doc...
 static inline
 char const * scrb_stream_name(struct scrb_stream const * const st)
 {
-    return scrb_stream_name__internal(st);
+    return scrb_stream_name_internal(st);
 }
 
 // `scrb_stream_severity`
@@ -163,7 +163,7 @@ char const * scrb_stream_name(struct scrb_stream const * const st)
 static inline
 uint16_t scrb_stream_severity(struct scrb_stream const * const st)
 {
-    return scrb_stream_severity__internal(st);
+    return scrb_stream_severity_internal(st);
 }
 
 // `scribe_open_file`
@@ -174,7 +174,7 @@ struct scrb_stream * scrb_open_stream(char const * const path,
                                       bool const synchronize,
                                       uint16_t const severity)
 {
-    return scrb_open_stream__internal(path, mode, synchronize, severity);
+    return scrb_open_stream_internal(path, mode, synchronize, severity);
 }
 
 // `scribe_close`
@@ -182,16 +182,16 @@ struct scrb_stream * scrb_open_stream(char const * const path,
 static inline
 void (scrb_close_stream)(struct scrb_stream ** streamptr)
 {
-    scrb_close_stream__internal(streamptr);
+    scrb_close_stream_internal(streamptr);
 }
-#define scrb_close_stream(streamptr) (scrb_close_stream)((struct scrb_stream **)(streamptr))
+#define scrb_close_stream(streamptr) (scrb_close_stream)((streamptr))
 
 // `scribe_flush_stream`
 // doc...
 static inline
 void scrb_flush_stream(struct scrb_stream * const st)
 {
-    scrb_flush_stream__internal(st);
+    scrb_flush_stream_internal(st);
 }
 
 // `scribe_write`
@@ -203,11 +203,11 @@ int (scrb_log)(struct scrb_meta_info const mi,
                uint16_t const severity,
                char const * const msg)
 {
-    if (severity & st->severity) {
-        return scrb_log__internal(mi, st, fmt, severity, msg, false); 
-    } else {
-        return SCRB_Success;
+    int rval = SCRB_Success;
+    if (severity >= st->severity) {
+        rval = scrb_log_internal(mi, st, fmt, severity, msg, false); 
     }
+    return rval;
 }
 #define scrb_log(st, fmt, sv, msg) (scrb_log)(get_meta_info((st)->name), (st), (fmt), (sv), (msg))
 
@@ -220,11 +220,11 @@ int (scrb_logln)(struct scrb_meta_info const mi,
                  uint16_t const severity,
                  char const * const msg)
 {
-    if (severity & st->severity) {
-        return scrb_log__internal(mi, st, fmt, severity, msg, true); 
-    } else {
-        return SCRB_Success;
+    int rval = SCRB_Success;
+    if (severity >= st->severity) {
+        rval = scrb_log_internal(mi, st, fmt, severity, msg, true); 
     }
+    return rval;
 }
 #define scrb_logln(st, fmt, sv, msg) (scrb_logln)(get_meta_info((st)->name), (st), (fmt), (sv), (msg))
 
@@ -233,7 +233,7 @@ int (scrb_logln)(struct scrb_meta_info const mi,
 static inline
 int scrb_putstr(struct scrb_stream * const st, char const * const msg)
 {
-    return scrb_putstr__internal(st, msg, false);
+    return scrb_putstr_internal(st, msg, false);
 }
 
 // `scribe_writestrln`
@@ -241,7 +241,7 @@ int scrb_putstr(struct scrb_stream * const st, char const * const msg)
 static inline
 int scrb_putstrln(struct scrb_stream * const st, char const * const msg)
 {
-    return scrb_putstr__internal(st, msg, true);
+    return scrb_putstr_internal(st, msg, true);
 }
 
 // `fscribe_write`
@@ -253,15 +253,14 @@ int (scrb_flog)(struct scrb_meta_info const mi,
                 uint16_t const severity,
                 char const * const msgfmt, ...)
 {
-    if (severity & st->severity) {
+    int rval = SCRB_Success;
+    if (severity >= st->severity) {
         va_list ap;
         va_start (ap, msgfmt);
-        int const rval = scrb_flog__internal(mi, st, fmt, severity, msgfmt, false, ap);
+        rval = scrb_flog_internal(mi, st, fmt, severity, msgfmt, false, ap);
         va_end (ap);
-        return rval;
-    } else {
-        return SCRB_Success;
     }
+    return rval;
 }
 #define scrb_flog(st, fmt, sv, msg, ...) (scrb_flog)(get_meta_info((st)->name), (st), (fmt), (sv), (msg), ##__VA_ARGS__)
 
@@ -274,15 +273,14 @@ int (scrb_flogln)(struct scrb_meta_info const mi,
                   uint16_t const severity,
                   char const * const msgfmt, ...)
 {
-    if (severity & st->severity) {
+    int rval = SCRB_Success;
+    if (severity >= st->severity) {
         va_list ap;
         va_start (ap, msgfmt);
-        int const rval = scrb_flog__internal(mi, st, fmt, severity, msgfmt, true, ap);
+        rval = scrb_flog_internal(mi, st, fmt, severity, msgfmt, true, ap);
         va_end (ap);
-        return rval;
-    } else {
-        return SCRB_Success;
     }
+    return rval;
 }
 #define scrb_flogln(st, fmt, sv, msg, ...) (scrb_flogln)(get_meta_info((st)->name), (st), (fmt), (sv), (msg), ##__VA_ARGS__)
 

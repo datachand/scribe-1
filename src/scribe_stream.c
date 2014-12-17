@@ -23,7 +23,7 @@
 #include "scribe_utils.h"
 #include "spinlock.h"
 
-struct scrb_stream * scrb_open_stream__internal(char const * const path, 
+struct scrb_stream * scrb_open_stream_internal(char const * const path, 
                                                 char const * const mode, 
                                                 bool const synchronize,
                                                 uint16_t const severity)
@@ -70,8 +70,12 @@ struct scrb_stream * scrb_open_stream__internal(char const * const path,
 		goto error;
 	}
 
-	struct scrb_stream * new_stream = malloc(sizeof(struct scrb_stream));
-	if (NULL == new_stream) {
+#if defined(__cplusplus)
+    struct scrb_stream * new_stream = (struct scrb_stream *) malloc(sizeof(struct scrb_stream));
+#else
+    struct scrb_stream * new_stream = malloc(sizeof(struct scrb_stream));
+#endif
+    if (NULL == new_stream) {
 #if SCRIBE_DEBUG
 		scrb_debug_write("Failed to create new stream object.");
 #endif
@@ -87,7 +91,7 @@ error:
 	return NULL;
 }
 
-void scrb_close_stream__internal(struct scrb_stream ** streamptr)
+void scrb_close_stream_internal(struct scrb_stream ** streamptr)
 {
 	if (NULL != streamptr && NULL != *streamptr
      && *streamptr != scrb_stdout
@@ -226,7 +230,7 @@ error:
     return (SCRB_Failure);
 }
 */
-void scrb_flush_stream__internal(struct scrb_stream * const st)
+void scrb_flush_stream_internal(struct scrb_stream * const st)
 {
     if (NULL != st) {
         fflush(st->stream.filestream);

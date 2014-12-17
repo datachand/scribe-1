@@ -61,7 +61,7 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    // We make open a new file called `example.log` in write mode without synchronization that only
+    // We open a new file called `example.log` in write mode without synchronization that only
     // listens to info level log messages.
     struct scrb_stream * const logstream = scrb_open_stream("example.log", "w", false, LVL_INFO);
     

@@ -15,6 +15,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdlib.h>
+#include "scribe_conf.h"
 
 typedef enum {
     FMT_UNKOWN = -1,

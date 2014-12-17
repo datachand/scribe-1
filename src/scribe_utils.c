@@ -53,7 +53,8 @@ error:
     return (SCRB_Failure);
 }
 
-char * scrb_build_msg(struct scrb_meta_info const mi, 
+char * scrb_build_msg(uint16_t const severity,
+                      struct scrb_meta_info const mi, 
                       struct scrb_format const * const fmt, 
                       char * const printbuff, 
                       uint64_t const cap, 
@@ -154,6 +155,13 @@ char * scrb_build_msg(struct scrb_meta_info const mi,
                 {
                     addlen     = strlen(mi.streamname);
                     add_string = mi.streamname;
+                    break;
+                }
+                case (FMT_SEVERITY):
+                {
+                    char const * const lvlstring = scrb_getlvlstring(severity);
+                    addlen     = strlen(lvlstring);
+                    add_string = lvlstring;
                     break;
                 }
                 case (FMT_MSG):

@@ -29,13 +29,15 @@ extern
 int scrb_log__internal(struct scrb_meta_info const mi, 
                        struct scrb_stream * const st,
 			           struct scrb_format const * const fmt, 
+                       uint16_t const severity,
                        char const * const msg, 
                        bool const newline);
 
 extern
 int scrb_flog__internal(struct scrb_meta_info const mi, 
                         struct scrb_stream const * const st,
-                        struct scrb_format const * const fmt, 
+                        struct scrb_format const * const fmt,
+                        uint16_t const severity, 
                         char const * const msgfmt, 
                         bool const newline, 
                         va_list ap);

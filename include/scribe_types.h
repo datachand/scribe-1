@@ -19,15 +19,17 @@ enum scrb_return {
 };
 
 enum scrb_loglevel {
-    LVLDEBUG  = 0,
-    LVLTRACE  = 1,
-    LVLINFO   = 2,
-    LVLNOTICE = 3,
-    LVLWARN   = 4,
-    LVLALERT  = 5,
-    LVLERROR  = 6,
-    LVLPANIC  = 7
+    LVL_DEBUG  = (1 << 0),
+    LVL_TRACE  = (1 << 1),
+    LVL_INFO   = (1 << 2),
+    LVL_NOTICE = (1 << 3),
+    LVL_WARN   = (1 << 4),
+    LVL_ALERT  = (1 << 5),
+    LVL_ERROR  = (1 << 6),
+    LVL_EMERG  = (1 << 7)
 };
+
+static char const * lvlstrings[] = { "DEBUG", "TRACE", "INFO", "NOTICE", "WARN", "ALERT", "ERROR", "EMERG", "uknown" };
 
 #ifdef __cplusplus
 }

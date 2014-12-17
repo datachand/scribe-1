@@ -74,6 +74,8 @@ struct scrb_format * scrb_create_format__internal(char const * const fmtstr,
                 tmp_fmttypes[tmp.numfmts] = FMT_TIME;
             } else if (fmtchar == fmtflags[FMT_STREAMNAME]) {
                 tmp_fmttypes[tmp.numfmts] = FMT_STREAMNAME;
+            } else if (fmtchar == fmtflags[FMT_SEVERITY]) {
+                tmp_fmttypes[tmp.numfmts] = FMT_SEVERITY;
             } else if (fmtchar == fmtflags[FMT_MSG]) {
                 tmp_fmttypes[tmp.numfmts] = FMT_MSG;
             } else if (fmtchar == fmtflags[FMT_PRCNT]) {

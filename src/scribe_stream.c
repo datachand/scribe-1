@@ -25,7 +25,8 @@
 
 struct scrb_stream * scrb_open_stream__internal(char const * const path, 
                                                 char const * const mode, 
-                                                bool const synchronize)
+                                                bool const synchronize,
+                                                uint16_t const severity)
 {
 	if (NULL == path) {
 #if SCRIBE_DEBUG
@@ -52,6 +53,7 @@ struct scrb_stream * scrb_open_stream__internal(char const * const path,
     struct scrb_stream tmp = {
 		.name        = stringdup(path),
 		.synchronize = synchronize,
+        .severity    = severity,
         .stream = {
             .mode       = mode,
             .filestream = filestream,

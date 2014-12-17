@@ -32,6 +32,16 @@ extern "C" {
 #include "Windows.h"
 #endif
 
+#define LVL_TO_DEBUG  (LVL_DEBUG)
+#define LVL_TO_TRACE  (LVL_DEBUG | LVL_TRACE)
+#define LVL_TO_INFO   (LVL_DEBUG | LVL_TRACE | LVL_INFO)
+#define LVL_TO_NOTICE (LVL_DEBUG | LVL_TRACE | LVL_INFO | LVL_NOTICE)
+#define LVL_TO_WARN   (LVL_DEBUG | LVL_TRACE | LVL_INFO | LVL_NOTICE | LVL_WARN)
+#define LVL_TO_ALERT  (LVL_DEBUG | LVL_TRACE | LVL_INFO | LVL_NOTICE | LVL_WARN | LVL_ALERT)
+#define LVL_TO_ERROR  (LVL_DEBUG | LVL_TRACE | LVL_INFO | LVL_NOTICE | LVL_WARN | LVL_ALERT | LVL_ERROR)
+#define LVL_TO_EMERG  (LVL_DEBUG | LVL_TRACE | LVL_INFO | LVL_NOTICE | LVL_WARN | LVL_ALERT | LVL_ERROR | LVL_EMERG)
+#define LVL_ALL       (LVL_DEBUG | LVL_TRACE | LVL_INFO | LVL_NOTICE | LVL_WARN | LVL_ALERT | LVL_ERROR | LVL_EMERG)
+
 static
 struct scrb_stream * const scrb_stdout = &stream_out_default;
 
@@ -61,6 +71,7 @@ int scrb_init(void)
         struct scrb_stream outstream = (struct scrb_stream) {
             .name        = "stdout",
             .synchronize = true,
+            .severity    = LVL_ALL, 
             .stream = {
                 .mode       = NULL,
                 .filestream = stdout,
@@ -71,6 +82,7 @@ int scrb_init(void)
         struct scrb_stream instream = (struct scrb_stream) {
             .name        = "stdin",
             .synchronize = true,
+            .severity    = LVL_ALL,
             .stream = {
                 .mode       = NULL,
                 .filestream = stdin,
@@ -81,6 +93,7 @@ int scrb_init(void)
         struct scrb_stream errstream = (struct scrb_stream) {
             .name        = "stderr",
             .synchronize = true,
+            .severity    = LVL_ALL,
             .stream = {
                 .mode       = NULL,
                 .filestream = stderr,
@@ -93,6 +106,7 @@ int scrb_init(void)
         struct scrb_stream dbgstream = (struct scrb_stream) {
             .name        = "debug",
             .synchronize = true,
+            .severity    = LVL_ALL,
             .stream = {
                 .mode       = NULL,
                 .filestream = dbg_filestream,
@@ -142,14 +156,23 @@ char const * scrb_stream_name(struct scrb_stream const * const st)
     return scrb_stream_name__internal(st);
 }
 
+// `scrb_stream_severity`
+// doc...
+static inline
+uint16_t scrb_stream_severity(struct scrb_stream const * const st)
+{
+    return scrb_stream_severity__internal(st);
+}
+
 // `scribe_open_file`
 // doc...
 static inline
 struct scrb_stream * scrb_open_stream(char const * const path, 
                                       char const * const mode, 
-                                      bool const synchronize)
+                                      bool const synchronize,
+                                      uint16_t const severity)
 {
-    return scrb_open_stream__internal(path, mode, synchronize);
+    return scrb_open_stream__internal(path, mode, synchronize, severity);
 }
 
 // `scribe_close`
@@ -175,11 +198,16 @@ static inline
 int (scrb_log)(struct scrb_meta_info const mi, 
                struct scrb_stream * const st, 
                struct scrb_format const * const fmt, 
+               uint16_t const severity,
                char const * const msg)
 {
-    return scrb_log__internal(mi, st, fmt, msg, false); 
+    if (severity & st->severity) {
+        return scrb_log__internal(mi, st, fmt, severity, msg, false); 
+    } else {
+        return SCRB_Success;
+    }
 }
-#define scrb_log(st, fmt, msg) (scrb_log)(get_meta_info((st)->name), (st), (fmt), (msg))
+#define scrb_log(st, fmt, sv, msg) (scrb_log)(get_meta_info((st)->name), (st), (fmt), (sv), (msg))
 
 // `scribe_writeln`
 // doc...
@@ -187,11 +215,16 @@ static inline
 int (scrb_logln)(struct scrb_meta_info const mi, 
                  struct scrb_stream * const st, 
                  struct scrb_format const * const fmt, 
+                 uint16_t const severity,
                  char const * const msg)
 {
-    return scrb_log__internal(mi, st, fmt, msg, true); 
+    if (severity & st->severity) {
+        return scrb_log__internal(mi, st, fmt, severity, msg, true); 
+    } else {
+        return SCRB_Success;
+    }
 }
-#define scrb_logln(st, fmt, msg) (scrb_logln)(get_meta_info((st)->name), (st), (fmt), (msg))
+#define scrb_logln(st, fmt, sv, msg) (scrb_logln)(get_meta_info((st)->name), (st), (fmt), (sv), (msg))
 
 // `scribe_writestr`
 // doc...
@@ -215,15 +248,20 @@ static inline
 int (scrb_flog)(struct scrb_meta_info const mi, 
                 struct scrb_stream * const st,
                 struct scrb_format const * const fmt, 
+                uint16_t const severity,
                 char const * const msgfmt, ...)
 {
-    va_list ap;
-    va_start (ap, msgfmt);
-    int const rval = scrb_flog__internal(mi, st, fmt, msgfmt, false, ap);
-    va_end (ap);
-    return rval;
+    if (severity & st->severity) {
+        va_list ap;
+        va_start (ap, msgfmt);
+        int const rval = scrb_flog__internal(mi, st, fmt, severity, msgfmt, false, ap);
+        va_end (ap);
+        return rval;
+    } else {
+        return SCRB_Success;
+    }
 }
-#define scrb_flog(st, fmt, msg, ...) (scrb_flog)(get_meta_info((st)->name), (st), (fmt), (msg), ##__VA_ARGS__)
+#define scrb_flog(st, fmt, sv, msg, ...) (scrb_flog)(get_meta_info((st)->name), (st), (fmt), (sv), (msg), ##__VA_ARGS__)
 
 // `fscribe_writeln`
 // doc...
@@ -231,15 +269,20 @@ static inline
 int (scrb_flogln)(struct scrb_meta_info const mi, 
                   struct scrb_stream * const st,
                   struct scrb_format const * const fmt, 
+                  uint16_t const severity,
                   char const * const msgfmt, ...)
 {
-    va_list ap;
-    va_start (ap, msgfmt);
-    int const rval = scrb_flog__internal(mi, st, fmt, msgfmt, true, ap);
-    va_end (ap);
-    return rval;
+    if (severity & st->severity) {
+        va_list ap;
+        va_start (ap, msgfmt);
+        int const rval = scrb_flog__internal(mi, st, fmt, severity, msgfmt, true, ap);
+        va_end (ap);
+        return rval;
+    } else {
+        return SCRB_Success;
+    }
 }
-#define scrb_flogln(st, fmt, msg, ...) (scrb_flogln)(get_meta_info((st)->name), (st), (fmt), (msg), ##__VA_ARGS__)
+#define scrb_flogln(st, fmt, sv, msg, ...) (scrb_flogln)(get_meta_info((st)->name), (st), (fmt), (sv), (msg), ##__VA_ARGS__)
 
 #ifdef __cplusplus
 }

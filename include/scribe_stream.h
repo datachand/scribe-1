@@ -36,6 +36,7 @@ struct streaminfo {
 struct scrb_stream {
 	char const * name;
     bool const synchronize;
+    uint16_t const severity;
     struct streaminfo stream;
     struct spinlock rwlock;
 };
@@ -78,13 +79,20 @@ void scrb_init_defaults(struct scrb_stream * const outstream,
 static inline
 char const * scrb_stream_name__internal(struct scrb_stream const * const st)
 {
-    return (NULL == st ? NULL : st->name);
+    return st->name;
+}
+
+static inline
+uint16_t scrb_stream_severity__internal(struct scrb_stream const * const st)
+{
+    return st->severity;
 }
 
 extern
 struct scrb_stream * scrb_open_stream__internal(char const * const path, 
                                                 char const * const mode, 
-                                                bool const synchronize);
+                                                bool const synchronize,
+                                                uint16_t const severity);
 
 extern
 void scrb_close_stream__internal(struct scrb_stream ** streamptr);

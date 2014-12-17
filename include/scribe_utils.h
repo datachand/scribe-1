@@ -66,6 +66,19 @@ SCRIBE_PID_T scrb_getpid(void)
 #endif
 }
 
+static inline
+char const * scrb_getlvlstring(uint16_t const severity)
+{
+    return severity & LVL_DEBUG  ? lvlstrings[0]
+         : severity & LVL_TRACE  ? lvlstrings[1]
+         : severity & LVL_INFO   ? lvlstrings[2]
+         : severity & LVL_NOTICE ? lvlstrings[3]
+         : severity & LVL_WARN   ? lvlstrings[4]
+         : severity & LVL_ERROR  ? lvlstrings[5]
+         : severity & LVL_ALERT  ? lvlstrings[6]
+         : severity & LVL_EMERG  ? lvlstrings[7] : lvlstrings[8];
+}
+
 #define get_meta_info(stname) (struct scrb_meta_info) {         \
                         .streamname = (stname),                 \
                         .file = __FILE__,                       \
@@ -91,7 +104,8 @@ char * stringdup(char const * const str)
 }
 
 extern
-char * scrb_build_msg(struct scrb_meta_info const mi, 
+char * scrb_build_msg(uint16_t const severity,
+                      struct scrb_meta_info const mi,
                       struct scrb_format const * const fmt, 
                       char * const printbuff, 
                       uint64_t const cap, 

@@ -27,12 +27,13 @@ typedef enum {
     FMT_PID = 3,
     FMT_TIME = 4,
     FMT_STREAMNAME = 5,
-    FMT_MSG = 6,
-    FMT_PRCNT = 7
+    FMT_SEVERITY = 6,
+    FMT_MSG = 7,
+    FMT_PRCNT = 8
 } fmttype;
 
 static
-char const fmtflags[] = { 'F', 'M', 'L', 'p', 't', 's', 'm', '%' };
+char const fmtflags[] = { 'F', 'M', 'L', 'p', 't', 'n', 's', 'm', '%' };
 
 static
 uint64_t const num_fmtflags = sizeof(fmtflags) / sizeof(fmtflags[0]);

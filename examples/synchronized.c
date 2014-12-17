@@ -33,8 +33,8 @@ void * threadlog(void * arg)
     (void) id;
     (void) fmt;
     for (uint64_t i = 0; i < NREPEATS; i += 1) {
-        //scrb_flogln(st, fmt, "thread %d writing to the log -- #%d", id, i);
-        scrb_logln(st, fmt, "thread writing to the log");
+        //scrb_flogln(st, fmt, LVL_TRACE, "thread %d writing to the log -- #%d", id, i);
+        scrb_logln(st, fmt, LVL_TRACE, "thread writing to the log");
     }
 
     return NULL;
@@ -58,13 +58,13 @@ int main(void)
         exit (EXIT_FAILURE);
     }
     
-    struct scrb_format const * const fmt = scrb_create_format("(%F|%L|%M) %m", &writetime);
+    struct scrb_format const * const fmt = scrb_create_format("[%s] (%F|%L|%M) %m", &writetime);
     if (NULL == fmt) {
         exit (EXIT_FAILURE);
     }
 
-    // use the file "synchtest.log" in synchronized write-only mode.
-    struct scrb_stream * const log = scrb_open_stream("synchtest.log", "w", true);
+    // use the file "synchtest.log" in synchronized write-only mode listening only to trace level logs.
+    struct scrb_stream * const log = scrb_open_stream("synchtest.log", "w", true, LVL_TRACE);
     if (NULL == log) {
         scrb_format_release(&fmt);
         exit (EXIT_FAILURE);

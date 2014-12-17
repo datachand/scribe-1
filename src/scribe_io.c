@@ -78,13 +78,14 @@ error:
 
 int scrb_log__internal(struct scrb_meta_info const mi, 
                        struct scrb_stream * const st,
-			           struct scrb_format const * const fmt, 
+                       struct scrb_format const * const fmt, 
+                       uint16_t const severity,
                        char const * const msg, 
                        bool const newline)
 {
     char printbuff[SCRB_BUFFCAPACITY];
     uint64_t msg_length    = 0;
-    char const * const wrt = scrb_build_msg(mi, fmt, printbuff, SCRB_BUFFCAPACITY, msg, &msg_length, newline);
+    char const * const wrt = scrb_build_msg(severity, mi, fmt, printbuff, SCRB_BUFFCAPACITY, msg, &msg_length, newline);
     
     if (unlikely(NULL == wrt)) {
 #if SCRIBE_DEBUG
@@ -117,6 +118,7 @@ error:
 int scrb_flog__internal(struct scrb_meta_info const mi, 
                         struct scrb_stream * const st,
                         struct scrb_format const * const fmt, 
+                        uint16_t const severity,
                         char const * const msgfmt, 
                         bool const newline, 
                         va_list ap)
@@ -143,9 +145,9 @@ int scrb_flog__internal(struct scrb_meta_info const mi,
     uint64_t msg_length = 0;
     
     if (likely(usebuff)) {
-        wrt = scrb_build_msg(mi, fmt, printbuff, SCRB_BUFFCAPACITY, msgbuff, &msg_length, newline);
+        wrt = scrb_build_msg(severity, mi, fmt, printbuff, SCRB_BUFFCAPACITY, msgbuff, &msg_length, newline);
     } else {
-        wrt = scrb_build_msg(mi, fmt, printbuff, SCRB_BUFFCAPACITY, msgalloc, &msg_length, newline);
+        wrt = scrb_build_msg(severity, mi, fmt, printbuff, SCRB_BUFFCAPACITY, msgalloc, &msg_length, newline);
         free((void *) msgalloc);
     }
     

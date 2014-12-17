@@ -10,8 +10,7 @@ branches:
 # travis-ci currently doesn't have gcc 4.7 or higher (which are the only gcc versions supporting the c11 standard), so
 # we have to exclude c11 builds with gcc.
 script:
-    - if [[ "$CC" == "clang" ]]; then "echo debug build c11 standard" && make std=c11 && ./examples/throughput && tail scribedebug.log \
-    && make clean && "echo regular build c11 standard" && make std=c11 OPTFLAGS=-DNDEBUG && ./examples/throughput && make clean; fi
+    - if [[ "$CC" == "clang" ]]; then "echo debug build c11 standard" && make std=c11 && ./examples/throughput && tail scribedebug.log && make clean && "echo regular build c11 standard" && make std=c11 OPTFLAGS=-DNDEBUG && ./examples/throughput && make clean; fi
     - "echo debug build c99 standard"
     - make std=c99
     - ./examples/throughput

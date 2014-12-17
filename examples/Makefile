@@ -24,6 +24,10 @@ cflags=-std=$(std) $(o_flags) $(dbg_flags) $(OPTFLAGS) -Werror -Wall -Wextra \
 iflags=-I$(include_dir) -I$(submodules_dir)/spinlock/include
 lflags=-L$(biuld_dir)
 
+ifeq ($(findstring gcc,$(CC)),gcc)
+	cflags:=$(filter-out -Wno-gnu-zero-variadic-macro-arguments, $(cflags))
+endif
+
 .PHONY: all
 
 all: $(targets)

@@ -58,7 +58,7 @@ sys     0m0.796s
 int main(void)
 {
     if (SCRB_Success != scrb_init()) {
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
     // We make open a new file called `example.log` in write mode without synchronization that only
@@ -81,7 +81,7 @@ int main(void)
 
     scrb_format_release(fmt);
     scrb_close_stream(logstream);
-    return 0;
+    return EXIT_SUCCESS;
 }
 ```
 

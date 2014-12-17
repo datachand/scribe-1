@@ -58,13 +58,13 @@ int main(void)
         exit (EXIT_FAILURE);
     }
     
-    struct scrb_format const * const fmt = scrb_create_format("[%s] (%F|%L|%M) %m", &writetime);
+    struct scrb_format * fmt = scrb_create_format("[%s] (%F|%L|%M) %m", &writetime);
     if (NULL == fmt) {
         exit (EXIT_FAILURE);
     }
 
     // use the file "synchtest.log" in synchronized write-only mode listening only to trace level logs.
-    struct scrb_stream * const log = scrb_open_stream("synchtest.log", "w", true, LVL_TRACE);
+    struct scrb_stream * log = scrb_open_stream("synchtest.log", "w", true, LVL_TRACE);
     if (NULL == log) {
         scrb_format_release(&fmt);
         exit (EXIT_FAILURE);
@@ -91,9 +91,6 @@ int main(void)
     exit (EXIT_SUCCESS);
 }
 
-#if defined(PRthread)
-#undef Pthread
-#endif
-#undef NthreadS
+#undef NTHREADS
 #undef NREPEATS
 

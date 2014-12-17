@@ -91,7 +91,7 @@ Currently available log format information includes:
 - Method location (`%M`)
 - Line location (`%L`)
 - Process ID (`%p`)
-- Time (requires providing a callback to format time output) (`%p`)
+- Time (requires providing a callback to format time output) (`%t`)
 - Stream name (`%n`)
 - Severity level (`%s`)
 

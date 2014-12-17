@@ -60,21 +60,22 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    // We make open a new file called `example.log` in write mode without synchronization.
-    struct scrb_stream * const logstream = scrb_open_stream("example.log", "w", false);
+    // We make open a new file called `example.log` in write mode without synchronization that only
+    // listens to info level log messages.
+    struct scrb_stream * const logstream = scrb_open_stream("example.log", "w", false, LVL_INFO);
     
     // We define a log format to tell scribe how to format our messages.
     // This format prints out the file, method, and line locations followed by the message itself.
     struct scrb_format * scrb_create_format("[%F:%L:%M] %m", NULL);
 
     // Now we're ready to go.
-    scrb_logln(logstream, fmt, "Hello from the example program!");
+    scrb_logln(logstream, fmt, LVL_INFO, "Hello from the example program!");
 
     // We can do formatted output as well.
-    scrb_flogln(logstream, fmt, "Hello for the %dnd time!", 2);
+    scrb_flogln(logstream, fmt, LVL_INFO, "Hello for the %dnd time!", 2);
 
     // If we want to write directly to the file without formatting or location/time info
-    // we can use the `scrb_putstrln` method.
+    // (or paying attention to log levels) we can use the `scrb_putstrln` method to write directly to the file.
     scrb_putstrln(logstream, "Now we're done.");
 
     scrb_format_release(fmt);

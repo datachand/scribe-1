@@ -14,7 +14,7 @@ targets=$(basename $(sources))
 
 CC?=clang
 std?=c11
-opt_flags?=-O2
+o_flags?=-O2
 dbg_flags?=-g0
 cflags=-std=$(std) $(o_flags) $(dbg_flags) $(OPTFLAGS) -Werror -Wall -Wextra \
 	   -Wformat=2 -Wshadow -Wwrite-strings -Wstrict-prototypes -Wold-style-definition \

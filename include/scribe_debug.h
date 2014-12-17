@@ -13,16 +13,17 @@
 extern "C" {
 #endif
 
+#if !defined(NDEBUG)
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 #include "scribe_conf.h"
+#include "scribe_metainfo.h"
 #include "scribe_stream.h"
-#include "scribe_utils.h"
 
-#if SCRIBE_DEBUG
 static inline
 void (scrb_debug_write)(struct scrb_meta_info const mi, char const * const msg, ...)
 {
@@ -42,6 +43,7 @@ void (scrb_debug_write)(struct scrb_meta_info const mi, char const * const msg, 
     va_end (ap);
 }
 #define scrb_debug_write(msg, ...) (scrb_debug_write)(get_meta_info(scrb_dbg_default.name), (msg), ##__VA_ARGS__)
+
 #endif
 
 #ifdef __cplusplus

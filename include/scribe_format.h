@@ -16,9 +16,6 @@ extern "C" {
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "scribe_conf.h"
-#include "scribe_utils.h"
-
 typedef enum {
     FMT_UNKOWN = -1,
     FMT_FILE = 0,

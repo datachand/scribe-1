@@ -8,9 +8,9 @@ build_dir=$(base)/build
 include_dir=$(base)/include
 submodules_dir=$(base)/submodules
 
-source=scribe_test.c
+sources=$(wildcard *.c)
 dep=$(build_dir)/libscribe.a
-target=
+targets=$(basename $(sources))
 
 CC?=clang
 std?=c11
@@ -28,11 +28,13 @@ ifeq ($(findstring gcc,$(CC)),gcc)
 	cflags:=$(filter-out -Wno-gnu-zero-variadic-macro-arguments, $(cflags))
 endif
 
-all: $(target)
+.PHONY: all
 
-$(target): $(source)
-	$(CC) $(iflags) $(cflags) $^ -o $@ $(dep)
+all: $(targets)
+
+$(targets): $(sources)
+	$(foreach tgt, $(targets), $(CC) $(iflags) $(cflags) $(tgt).c -o $(tgt) $(dep); )
 
 clean:
-	@rm -rf $(target) *.dSYM
+	@rm -rf $(targets) *.dSYM *.log
 

@@ -33,7 +33,7 @@ endif
 
 .PHONY: all update setup build test examples clean
 
-all: examples
+all: examples test
 
 update:
 	git submodule foreach git pull origin master

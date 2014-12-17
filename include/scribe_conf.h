@@ -54,7 +54,7 @@
 #endif
 
 // GNU extension availability
-#if defined(__gnuc__) || defined(__GNUC__)
+#if defined(__gnuc__) || defined(__GNUC__) || defined(__GNUG__)
 #   define SCRIBE_GNUC_AVAILABLE 1
 #else
 #   define SCRIBE_GNUC_AVAILABLE 0
@@ -62,13 +62,65 @@
 
 #if !defined(SCRIBE_WINDOWS)
 #include <unistd.h>
-#define SCRIBE_STDIN_FILENO STDIN_FILENO
-#define SCRIBE_STDOUT_FILENO STDOUT_FILENO
-#define SCRIBE_STDERR_FILENO STDERR_FILENO
+#   define SCRIBE_STDIN_FILENO STDIN_FILENO
+#   define SCRIBE_STDOUT_FILENO STDOUT_FILENO
+#   define SCRIBE_STDERR_FILENO STDERR_FILENO
 #else
-#define SCRIBE_STDIN_FILENO 0
-#define SCRIBE_STDOUT_FILENO 1
-#define SCRIBE_STDERR_FILENO 3
+#   define SCRIBE_STDIN_FILENO 0
+#   define SCRIBE_STDOUT_FILENO 1
+#   define SCRIBE_STDERR_FILENO 3
+#endif
+
+// which compiler/language is being used
+#if defined(__cplusplus)
+#   define SCRB_LANGUAGE "C++"
+#else
+#   define SCRB_LANGUAGE "C"
+#endif
+
+#if defined(__clang__)
+#   define SCRB_CC "clang/LLVM"
+#   define SCRB_CC_VER __clang_version__
+#elif defined(__ICC) || defined(__INTEL_COMPILER)
+#   define SCRB_CC "Intel ICC"
+#   define SCRB_CC_VER __VERSION__
+#elif defined(__gnuc__) || defined(__GNUC__) || defined(__GNUG__)
+#   define SCRB_CC "GNU GCC/G++"
+#   define SCRB_CC_VER __VERSION__
+#elif defined(__HP_cc) || defined(__HP_aCC)
+#   define SCRB_CC "HP C/aC++"
+#if defined(__cplusplus)
+#   define SCRB_CC_VER __HP_aCC
+#else
+#   define SCRB_CC_VER __HP_cc
+#endif
+#elif defined(__IBMC__) || defined(__IBMCPP__)
+#   define SCRB_CC "IBM XL C/C++"
+#if defined(__cplusplus)
+#   define SCRB_CC_VER __IBMCPP__
+#else
+#   define SCRB_CC_VER __xlc__
+#endif
+#elif defined(_MSC_VER)
+#   define SCRB_CC "MS Visual Studio"
+#if defined(_MSC_FULL_VER)
+#   define SCRB_CC_VER _MSC_FULL_VER
+#else
+#   define SCRB_CC_VER _MSC_VER
+#endif
+#elif defined(__PGI)
+#   define SCRB_CC "Portland Group PGCC/PGCPP"
+#   define SCRB_CC_VER __PGIC__"."__PGIC_MINOR__"."__PGIC_PATCHLEVEL__
+#elif defined(__SUNPRO_C) || defined(__SUNPRO_CC)
+#   define SCRB_CC "Oracle Solaris Studio"
+#if defined(__cplusplus)
+#   define SCRB_CC_VER __SUNPRO_CC
+#else
+#   define SCRB_CC_VER __SUNPRO_C
+#endif
+#else
+#   define SCRB_CC "unknown_cc"
+#   define SCRB_CC_VER "unknown_cc_ver"
 #endif
 
 #endif

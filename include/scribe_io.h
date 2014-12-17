@@ -17,7 +17,6 @@ extern "C" {
 #include <stdbool.h>
 
 #include "scribe.h"
-#include "scribe_conf.h"
 #include "scribe_format.h"
 #include "scribe_stream.h"
 #include "scribe_utils.h"

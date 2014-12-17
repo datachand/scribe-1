@@ -17,7 +17,7 @@
 #include "scribe_debug.h"
 #include "scribe_format.h"
 #include "scribe_stream.h"
-#include "scribe_types.h"
+#include "scribe_return_types.h"
 #include "scribe_utils.h"
 #include "spinlock.h"
 

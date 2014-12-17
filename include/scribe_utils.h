@@ -18,9 +18,8 @@ extern "C" {
 #include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
-#ifdef SCRIBE_WINDOWS
+#if defined(SCRIBE_WINDOWS)
 #include "Windows.h"
 #include <process.h>
 #else
@@ -30,64 +29,8 @@ extern "C" {
 #endif
 
 #include "scribe_format.h"
-#include "scribe_types.h"
-
-struct scrb_meta_info {
-    char const * const streamname;
-    char const * const file;
-    char const * const mthd;
-    int const line;
-    uint64_t const filelen;
-    uint64_t const mthdlen;
-    SCRIBE_PID_T pid;
-    SCRIBE_TIME_T ts;
-};
-
-static inline
-SCRIBE_TIME_T scrb_gettime(void)
-{
-#if defined(SCRIBE_WINDOWS)
-    SYSTEMTIME ts;
-    GetSystemTime(&ts);
-#else
-    struct timeval ts;
-    gettimeofday(&ts, NULL);
-#endif
-    return ts;
-}
-
-static inline
-SCRIBE_PID_T scrb_getpid(void)
-{
-#ifdef SCRIBE_WINDOWS
-    return _getpid();
-#else
-    return getpid();
-#endif
-}
-
-static inline
-char const * scrb_getlvlstring(uint16_t const severity)
-{
-    return severity & LVL_DEBUG  ? lvlstrings[0]
-         : severity & LVL_TRACE  ? lvlstrings[1]
-         : severity & LVL_INFO   ? lvlstrings[2]
-         : severity & LVL_NOTICE ? lvlstrings[3]
-         : severity & LVL_WARN   ? lvlstrings[4]
-         : severity & LVL_ERROR  ? lvlstrings[5]
-         : severity & LVL_ALERT  ? lvlstrings[6]
-         : severity & LVL_EMERG  ? lvlstrings[7] : lvlstrings[8];
-}
-
-#define get_meta_info(stname) (struct scrb_meta_info) {         \
-                        .streamname = (stname),                 \
-                        .file = __FILE__,                       \
-                        .mthd = __FUNCTION__,                   \
-                        .line = __LINE__,                       \
-                        .filelen = sizeof((__FILE__)) - 1,      \
-                        .mthdlen = sizeof((__FUNCTION__)) - 1 , \
-                        .pid = scrb_getpid(),                   \
-                        .ts = scrb_gettime() }
+#include "scribe_metainfo.h"
+#include "scribe_return_types.h"
 
 static inline
 char * stringdup(char const * const str)

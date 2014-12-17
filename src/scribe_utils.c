@@ -6,16 +6,17 @@
 // License: Please see LICENSE.md
 //
 
-#include "scribe_conf.h"
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "scribe_conf.h"
 #include "scribe_debug.h"
 #include "scribe_format.h"
-#include "scribe_types.h"
+#include "scribe_loglevel.h"
+#include "scribe_metainfo.h"
+#include "scribe_return_types.h"
 #include "scribe_utils.h"
 
 #define BUILDER_INIT_SIZE 128
@@ -159,9 +160,9 @@ char * scrb_build_msg(uint16_t const severity,
                 }
                 case (FMT_SEVERITY):
                 {
-                    char const * const lvlstring = scrb_getlvlstring(severity);
-                    addlen     = strlen(lvlstring);
-                    add_string = lvlstring;
+                    char const * const levelstr = scrb_getlevelstr(severity);
+                    addlen     = strlen(levelstr);
+                    add_string = levelstr;
                     break;
                 }
                 case (FMT_MSG):

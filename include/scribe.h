@@ -21,10 +21,12 @@ extern "C" {
 
 #include "scribe_conf.h"
 #include "scribe_debug.h"
-#include "scribe_io.h"
-#include "scribe_stream.h"
-#include "scribe_types.h"
 #include "scribe_format.h"
+#include "scribe_io.h"
+#include "scribe_loglevel.h"
+#include "scribe_metainfo.h"
+#include "scribe_return_types.h"
+#include "scribe_stream.h"
 #include "scribe_utils.h"
 #include "spinlock.h"
 
@@ -119,7 +121,7 @@ int scrb_init(void)
         }
 
         scrb_init_defaults(&outstream, &instream, &errstream, &dbgstream);
-        fprintf(dbgstream.stream.filestream, "----- scribe init :: version (%s) :: compiled (%s %s) :: pid (%d) -----\n",
+        fprintf(dbgstream.stream.filestream, "----- scribe init :: version (%s) :: compile date (%s %s) :: compiled as "SCRB_LANGUAGE" by "SCRB_CC" ver. " SCRB_CC_VER " :: pid (%d) -----\n",
                 SCRIBE_VERSION, __DATE__, __TIME__, (int) scrb_getpid());
 #else
         scrb_init_defaults(&outstream, &instream, &errstream);

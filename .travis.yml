@@ -10,6 +10,6 @@ branches:
 # travis-ci currently doesn't have gcc 4.7 or higher (which are the only gcc versions supporting the c11 standard), so
 # we have to exclude c11 builds with gcc.
 script:
-    - if [[ "$CC" == "clang" ]]; then ./buildscripts/clang-build.sh; fi
-    - if [[ "$CC" == "gcc" ]]; then ./buildscripts/gcc-build.sh; fi
+    - if [[ "$CC" == "clang" ]]; then sh ./buildscripts/clang-build.sh; fi
+    - if [[ "$CC" == "gcc" ]]; then sh ./buildscripts/gcc-build.sh; fi
 

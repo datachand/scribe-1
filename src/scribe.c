@@ -17,13 +17,14 @@
 #include "scribe_return_types.h"
 #include "scribe_stream.h"
 
-int scrb_init_internal(struct scrb_stream ** scrb_stdoutptr,
-                       struct scrb_stream ** scrb_stdinptr,
-                       struct scrb_stream ** scrb_stderrptr
+struct scrb_stream * scrb_stdout = NULL;
+struct scrb_stream * scrb_stdin  = NULL;
+struct scrb_stream * scrb_stderr = NULL;
 #if SCRIBE_DEBUG
-                       ,struct scrb_stream ** scrb_debugptr
+struct scrb_stream * scrb_debug  = NULL;
 #endif
-                      )
+
+int scrb_init(void)
 {
 #if defined(SCRIBE_WINDOWS)
     static volatile LONG initialized = 0;
@@ -67,34 +68,33 @@ int scrb_init_internal(struct scrb_stream ** scrb_stdoutptr,
 
         // allocate and initialized standard streams
 #if defined(__cplusplus)
-        *scrb_stdoutptr = (struct scrb_stream *) malloc(sizeof(struct scrb_stream));
+        scrb_stdout = (struct scrb_stream *) malloc(sizeof(struct scrb_stream));
 #else
-        *scrb_stdoutptr = malloc(sizeof(struct scrb_stream));
+        scrb_stdout = malloc(sizeof(struct scrb_stream));
 #endif
-        if (NULL == *scrb_stdoutptr) {
+        if (NULL == scrb_stdout) {
+            errno = ENOMEM;
+            goto error;
+        }
+#if defined(__cplusplus)
+        scrb_stdin = (struct scrb_stream *) malloc(sizeof(struct scrb_stream));
+#else
+        scrb_stdin = malloc(sizeof(struct scrb_stream));
+#endif
+        if (NULL == scrb_stdin) {
+            free(scrb_stdout);
             errno = ENOMEM;
             goto error;
         }
 
 #if defined(__cplusplus)
-        *scrb_stdinptr = (struct scrb_stream *) malloc(sizeof(struct scrb_stream));
+        scrb_stderr = (struct scrb_stream *) malloc(sizeof(struct scrb_stream));
 #else
-        *scrb_stdinptr = malloc(sizeof(struct scrb_stream));
+        scrb_stderr = malloc(sizeof(struct scrb_stream));
 #endif
-        if (NULL == *scrb_stdinptr) {
-            free(*scrb_stdoutptr);
-            errno = ENOMEM;
-            goto error;
-        }
-
-#if defined(__cplusplus)
-        *scrb_stderrptr = (struct scrb_stream *) malloc(sizeof(struct scrb_stream));
-#else
-        *scrb_stderrptr = malloc(sizeof(struct scrb_stream));
-#endif
-        if (NULL == *scrb_stderrptr) {
-            free(*scrb_stdoutptr);
-            free(*scrb_stdinptr);
+        if (NULL == scrb_stderr) {
+            free(scrb_stdout);
+            free(scrb_stdin);
             errno = ENOMEM;
             goto error;
         }
@@ -102,7 +102,7 @@ int scrb_init_internal(struct scrb_stream ** scrb_stdoutptr,
 #if SCRIBE_DEBUG
         FILE * const dbg_filestream = fopen("scribedebug.log", "a");
         struct scrb_stream dbgstream = {
-            .name        = "debug",
+            .name        = "scribedebug.log",
             .synchronize = true,
             .severity    = LVL_ALL,
             .stream = {
@@ -120,22 +120,22 @@ int scrb_init_internal(struct scrb_stream ** scrb_stdoutptr,
         }
 
 #if defined(__cplusplus)
-        *scrb_debugptr = (struct scrb_stream *) malloc(sizeof(struct scrb_stream));
+        scrb_debug = (struct scrb_stream *) malloc(sizeof(struct scrb_stream));
 #else
-        *scrb_debugptr = malloc(sizeof(struct scrb_stream));
+        scrb_debug = malloc(sizeof(struct scrb_stream));
 #endif
-        if (NULL == *scrb_debugptr) {
-            free(*scrb_stdoutptr);
-            free(*scrb_stdinptr);
-            free(*scrb_stderrptr);
+        if (NULL == scrb_debug) {
+            free(scrb_stdout);
+            free(scrb_stdin);
+            free(scrb_stderr);
             errno = ENOMEM;
             goto error;
         }
-        memcpy(*scrb_debugptr, &dbgstream, sizeof(struct scrb_stream));
+        memcpy(scrb_debug, &dbgstream, sizeof(struct scrb_stream));
 #endif
-        memcpy(*scrb_stdoutptr, &outstream, sizeof(struct scrb_stream));
-        memcpy(*scrb_stdinptr, &instream, sizeof(struct scrb_stream));
-        memcpy(*scrb_stderrptr, &errstream, sizeof(struct scrb_stream));
+        memcpy(scrb_stdout, &outstream, sizeof(struct scrb_stream));
+        memcpy(scrb_stdin, &instream, sizeof(struct scrb_stream));
+        memcpy(scrb_stderr, &errstream, sizeof(struct scrb_stream));
 #if SCRIBE_DEBUG 
         fprintf(dbgstream.stream.filestream, 
                 "----- successful scribe init :: version (%s) :: compile date (%s %s) "
@@ -147,3 +147,4 @@ int scrb_init_internal(struct scrb_stream ** scrb_stdoutptr,
 error:
     return (SCRB_Failure);
 }
+

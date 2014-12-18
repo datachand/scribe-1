@@ -44,35 +44,19 @@ extern "C" {
 #define LVL_TO_EMERG  (LVL_DEBUG | LVL_TRACE | LVL_INFO | LVL_NOTICE | LVL_WARN | LVL_ALERT | LVL_ERROR | LVL_EMERG)
 #define LVL_ALL       (LVL_DEBUG | LVL_TRACE | LVL_INFO | LVL_NOTICE | LVL_WARN | LVL_ALERT | LVL_ERROR | LVL_EMERG)
 
-static
+extern
 struct scrb_stream * scrb_stdout;
 
-static
+extern
 struct scrb_stream * scrb_stdin;
 
-static
-struct scrb_stream * scrb_stderr;
-
 extern
-int scrb_init_internal(struct scrb_stream ** scrb_stdoutptr,
-                       struct scrb_stream ** scrb_stdinptr,
-                       struct scrb_stream ** scrb_stderrptr
-#if SCRIBE_DEBUG
-                       ,struct scrb_stream ** scrb_debugptr
-#endif
-                      );
+struct scrb_stream * scrb_stderr;
 
 // `scrb_init`
 // doc...
-static inline
-int scrb_init(void)
-{
-#if SCRIBE_DEBUG
-    return scrb_init_internal(&scrb_stdout, &scrb_stdin, &scrb_stderr, &scrb_debug);
-#else
-    return scrb_init_internal(&scrb_stdout, &scrb_stdin, &scrb_stderr);
-#endif
-}
+extern 
+int scrb_init(void);
 
 // `scrb_create_format`
 // doc...

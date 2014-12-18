@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-static
+extern
 struct scrb_stream * scrb_debug;
 
 static inline

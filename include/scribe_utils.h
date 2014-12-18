@@ -36,13 +36,12 @@ static inline
 char * stringdup(char const * const str)
 {
     uint64_t const len = strlen(str);
-    char * const new   = malloc(len + 1);
+    char * const new   = calloc(len + 1, sizeof(char));
     if (NULL == new) {
         errno = ENOMEM;
         return NULL;
     }
-    memcpy(new, str, len);
-    new[len] = '\0';
+    memcpy(new, str, len + 1);
     return new;
 }
 

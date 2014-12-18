@@ -6,7 +6,6 @@
 // License: Please see LICENSE.md
 //
 
-#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "scribe.h"

@@ -24,6 +24,9 @@
 extern "C" {
 #endif
 
+static
+struct scrb_stream * scrb_debug;
+
 static inline
 void (scrb_debug_write)(struct scrb_meta_info const mi, char const * const msg, ...)
 {
@@ -37,9 +40,9 @@ void (scrb_debug_write)(struct scrb_meta_info const mi, char const * const msg, 
     strftime(timebuff, 25, "%G:%m:%d:%H:%M:%S.", localtime(&(mi.ts.tv_sec)));
     snprintf(timebuff + 20, 4, "%ld", (long int) mi.ts.tv_usec);
 #endif 
-    fprintf(scrb_dbg_default.stream.filestream, "%s (%s::%s::%d) ", timebuff, mi.file, mi.mthd, mi.line);
-    vfprintf(scrb_dbg_default.stream.filestream, msg, ap);
-    fputc('\n', scrb_dbg_default.stream.filestream);
+    fprintf(scrb_debug->stream.filestream, "%s (%s::%s::%d) ", timebuff, mi.file, mi.mthd, mi.line);
+    vfprintf(scrb_debug->stream.filestream, msg, ap);
+    fputc('\n', scrb_debug->stream.filestream);
     va_end (ap);
 }
 #define scrb_debug_write(msg, ...) (scrb_debug_write)(get_meta_info(), (msg), ##__VA_ARGS__)

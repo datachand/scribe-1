@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "scribe_conf.h"
 #include "scribe_debug.h"
@@ -45,89 +46,33 @@ extern "C" {
 #define LVL_ALL       (LVL_DEBUG | LVL_TRACE | LVL_INFO | LVL_NOTICE | LVL_WARN | LVL_ALERT | LVL_ERROR | LVL_EMERG)
 
 static
-struct scrb_stream * const scrb_stdout = &stream_out_default;
+struct scrb_stream * scrb_stdout;
 
 static
-struct scrb_stream * const scrb_stdin  = &stream_in_default;
+struct scrb_stream * scrb_stdin;
 
 static
-struct scrb_stream * const scrb_stderr = &stream_err_default;
+struct scrb_stream * scrb_stderr;
 
+extern
+int scrb_init_internal(struct scrb_stream ** scrb_stdoutptr,
+                       struct scrb_stream ** scrb_stdinptr,
+                       struct scrb_stream ** scrb_stderrptr
 #if SCRIBE_DEBUG
-static
-struct scrb_stream const * const scrb_debug  = &scrb_dbg_default;
+                       ,struct scrb_stream ** scrb_debugptr
 #endif
+                      );
 
 // `scrb_init`
 // doc...
 static inline
 int scrb_init(void)
 {
-#if defined(SCRIBE_WINDOWS)
-    static volatile LONG initialized = 0;
-    if (0 == InterlockedCompareExchange(&initialized, 1, 0)) {
-#else    
-    static volatile int initialized = 0;
-    if (__sync_bool_compare_and_swap(&initialized, 0, 1)) {
-#endif
-        struct scrb_stream outstream = {
-            .name        = "stdout",
-            .synchronize = true,
-            .severity    = LVL_ALL, 
-            .stream = {
-                .mode       = "a",
-                .filestream = stdout,
-            },
-            .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
-        };
-
-        struct scrb_stream instream = {
-            .name        = "stdin",
-            .synchronize = true,
-            .severity    = LVL_ALL,
-            .stream = {
-                .mode       = "a",
-                .filestream = stdin,
-            },
-            .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
-        };
-
-        struct scrb_stream errstream = {
-            .name        = "stderr",
-            .synchronize = true,
-            .severity    = LVL_ALL,
-            .stream = {
-                .mode       = "a",
-                .filestream = stderr,
-            },
-            .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY) 
-        };
-
 #if SCRIBE_DEBUG
-        FILE * const dbg_filestream = fopen("scribedebug.log", "a");
-        struct scrb_stream dbgstream = {
-            .name        = "debug",
-            .synchronize = true,
-            .severity    = LVL_ALL,
-            .stream = {
-                .mode       = NULL,
-                .filestream = dbg_filestream,
-            },
-            .rwlock = spinlock_init(SCRIBE_RWLOCK_DELAY)
-        };
-
-        if (NULL == dbgstream.stream.filestream) {
-            return (SCRB_Failure);
-        }
-
-        scrb_init_defaults(&outstream, &instream, &errstream, &dbgstream);
-        fprintf(dbgstream.stream.filestream, "----- scribe init :: version (%s) :: compile date (%s %s) :: compiled as "SCRB_LANGUAGE" by "SCRB_CC" ver. " SCRB_CC_VER " :: pid (%d) -----\n",
-                SCRIBE_VERSION, __DATE__, __TIME__, (int) scrb_getpid());
+    return scrb_init_internal(&scrb_stdout, &scrb_stdin, &scrb_stderr, &scrb_debug);
 #else
-        scrb_init_defaults(&outstream, &instream, &errstream);
+    return scrb_init_internal(&scrb_stdout, &scrb_stdin, &scrb_stderr);
 #endif
-    }
-    return (SCRB_Success);
 }
 
 // `scrb_create_format`

@@ -41,41 +41,6 @@ struct scrb_stream {
     struct spinlock rwlock;
 };
 
-struct scrb_stream stream_out_default;
-
-struct scrb_stream stream_in_default;
-
-struct scrb_stream stream_err_default;
-
-#if SCRIBE_DEBUG
-struct scrb_stream scrb_dbg_default;
-#endif
-
-static inline
-void scrb_init_defaults(struct scrb_stream * const outstream,
-                        struct scrb_stream * const instream,
-                        struct scrb_stream * const errstream, ...)
-{
-#if defined(SCRIBE_WINDOWS)
-    static volatile LONG initialized = 0;
-    if (0 == InterlockedCompareExchange(&initialized, 1, 0)) {
-#else    
-    static volatile int initialized = 0;
-    if (__sync_bool_compare_and_swap(&initialized, 0, 1)) {
-#endif
-        memcpy(&stream_out_default, outstream, sizeof(struct scrb_stream));
-        memcpy(&stream_in_default, instream, sizeof(struct scrb_stream));
-        memcpy(&stream_err_default, errstream, sizeof(struct scrb_stream));
-#if SCRIBE_DEBUG
-        va_list ap;
-        va_start (ap, errstream);
-        struct scrb_stream * const dbgstream = va_arg(ap, struct scrb_stream *);
-        memcpy(&scrb_dbg_default, dbgstream, sizeof(struct scrb_stream));
-        va_end (ap); 
-#endif
-    }
-}
-
 static inline
 char const * scrb_stream_name_internal(struct scrb_stream const * const st)
 {

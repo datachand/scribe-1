@@ -1,5 +1,5 @@
 # scribe 
-[![Build Status](https://travis-ci.org/daltonwoodard/scribe.svg?branch=master)](https://travis-ci.org/daltonwoodard/sorting)
+[![Build Status](https://travis-ci.org/daltonwoodard/scribe.svg?branch=master)](https://travis-ci.org/daltonwoodard/scribe)
 
 ## Description
 A fast and simple stream based logging library for C. The API should be mostly stable from now on. Almost all planned features of 

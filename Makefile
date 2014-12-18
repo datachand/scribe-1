@@ -63,7 +63,7 @@ examples: build
 	@make -C $(examples_dir)
 
 clean:
-	@rm -rf $(object_dir) $(build_dir) *.dSYM *.DS_Store
+	@rm -rf $(object_dir) $(build_dir) *.log *.dSYM *.DS_Store
 	@make -C $(test_dir) clean
 	@make -C $(examples_dir) clean
 

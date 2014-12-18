@@ -10,7 +10,7 @@ Author: Dalton Woodard
 
 Contact: daltonmwoodard@gmail.com
 
-## Info
+## Build Info
 Currently scribe is known to build successfully on:
 
 - OS X 10.10.1 with clang-600.0.56 and gcc 4.9.2 against the ISO c11 and c99 standards.

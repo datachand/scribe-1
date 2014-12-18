@@ -29,7 +29,6 @@ extern "C" {
 #endif
 
 struct scrb_meta_info {
-    char const * const streamname;
     char const * const file;
     char const * const mthd;
     int const line;
@@ -62,8 +61,7 @@ SCRIBE_PID_T scrb_getpid(void)
 #endif
 }
 
-#define get_meta_info(stname) (struct scrb_meta_info) {         \
-                        .streamname = (stname),                 \
+#define get_meta_info() (struct scrb_meta_info) {               \
                         .file = __FILE__,                       \
                         .mthd = __FUNCTION__,                   \
                         .line = __LINE__,                       \

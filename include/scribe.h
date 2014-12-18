@@ -207,7 +207,7 @@ int (scrb_log)(struct scrb_meta_info const mi,
     }
     return rval;
 }
-#define scrb_log(st, fmt, sv, msg) (scrb_log)(get_meta_info((st)->name), (st), (fmt), (sv), (msg))
+#define scrb_log(st, fmt, sv, msg) (scrb_log)(get_meta_info(), (st), (fmt), (sv), (msg))
 
 // `scribe_writeln`
 // doc...
@@ -224,7 +224,7 @@ int (scrb_logln)(struct scrb_meta_info const mi,
     }
     return rval;
 }
-#define scrb_logln(st, fmt, sv, msg) (scrb_logln)(get_meta_info((st)->name), (st), (fmt), (sv), (msg))
+#define scrb_logln(st, fmt, sv, msg) (scrb_logln)(get_meta_info(), (st), (fmt), (sv), (msg))
 
 // `scribe_writestr`
 // doc...
@@ -260,7 +260,7 @@ int (scrb_flog)(struct scrb_meta_info const mi,
     }
     return rval;
 }
-#define scrb_flog(st, fmt, sv, msg, ...) (scrb_flog)(get_meta_info((st)->name), (st), (fmt), (sv), (msg), ##__VA_ARGS__)
+#define scrb_flog(st, fmt, sv, msg, ...) (scrb_flog)(get_meta_info(), (st), (fmt), (sv), (msg), ##__VA_ARGS__)
 
 // `fscribe_writeln`
 // doc...
@@ -280,7 +280,7 @@ int (scrb_flogln)(struct scrb_meta_info const mi,
     }
     return rval;
 }
-#define scrb_flogln(st, fmt, sv, msg, ...) (scrb_flogln)(get_meta_info((st)->name), (st), (fmt), (sv), (msg), ##__VA_ARGS__)
+#define scrb_flogln(st, fmt, sv, msg, ...) (scrb_flogln)(get_meta_info(), (st), (fmt), (sv), (msg), ##__VA_ARGS__)
 
 #ifdef __cplusplus
 }

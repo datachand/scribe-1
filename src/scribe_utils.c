@@ -60,6 +60,7 @@ error:
 }
 
 char * scrb_build_msg(uint16_t const severity,
+                      char const * const streamname,
                       struct scrb_meta_info const mi, 
                       struct scrb_format const * const fmt, 
                       char * const printbuff, 
@@ -159,8 +160,8 @@ char * scrb_build_msg(uint16_t const severity,
                 }
                 case (FMT_STREAMNAME):
                 {
-                    addlen     = strlen(mi.streamname);
-                    add_string = mi.streamname;
+                    addlen     = strlen(streamname);
+                    add_string = streamname;
                     break;
                 }
                 case (FMT_SEVERITY):

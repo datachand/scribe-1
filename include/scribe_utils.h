@@ -48,6 +48,7 @@ char * stringdup(char const * const str)
 
 extern
 char * scrb_build_msg(uint16_t const severity,
+                      char const * const streamname,
                       struct scrb_meta_info const mi,
                       struct scrb_format const * const fmt, 
                       char * const printbuff, 

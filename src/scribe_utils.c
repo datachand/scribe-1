@@ -124,13 +124,13 @@ char * scrb_build_msg(uint16_t const severity,
                 }
                 case (FMT_LINE):
                 {
-                    addlen     = snprintf(writebuffer, 20, "%d", mi.line);
+                    addlen     = (uint64_t) snprintf(writebuffer, 20, "%d", mi.line);
                     add_string = writebuffer;
                     break;
                 }
                 case (FMT_PID):
                 {
-                    addlen     = snprintf(writebuffer, 20, "%d", (int) mi.pid);
+                    addlen     = (uint64_t) snprintf(writebuffer, 20, "%d", (int) mi.pid);
                     add_string = writebuffer;
                     break;
                 }

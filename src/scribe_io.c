@@ -16,6 +16,7 @@
 #include "scribe_conf.h"
 #include "scribe_debug.h"
 #include "scribe_format.h"
+#include "scribe_io.h"
 #include "scribe_stream.h"
 #include "scribe_return_types.h"
 #include "scribe_utils.h"
@@ -33,7 +34,7 @@
 static
 char const * build_alloced(char const * const msgfmt, va_list ap)
 {
-    char * msg       = NULL;
+    char * msg      = NULL;
     uint64_t trysize = SCRB_MSGBUFFCAPACITY;
     uint64_t retlen;
     do {
@@ -42,11 +43,11 @@ char const * build_alloced(char const * const msgfmt, va_list ap)
         msg = (char *) realloc(msg, trysize * sizeof(char));
 #else
         msg = realloc(msg, trysize * sizeof(char));
-#endif   
+#endif 
         if (NULL == msg) {
             break;
         }
-        retlen = vsnprintf(msg, trysize, msgfmt, ap);
+        retlen = (uint16_t) vsnprintf(msg, trysize, msgfmt, ap);
         if (retlen < trysize) {
             break;
         }
@@ -130,7 +131,7 @@ int scrb_flog_internal(struct scrb_meta_info const mi,
     bool usebuff          = true;
     char const * msgalloc = NULL;
 	char msgbuff[SCRB_MSGBUFFCAPACITY];
-    uint64_t const retlen = vsnprintf(msgbuff, SCRB_MSGBUFFCAPACITY, msgfmt, ap);
+    uint64_t const retlen = (uint64_t) vsnprintf(msgbuff, SCRB_MSGBUFFCAPACITY, msgfmt, ap);
 
 	if (unlikely(retlen >= SCRB_MSGBUFFCAPACITY)) {
 	    usebuff  = false;

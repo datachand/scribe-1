@@ -3,8 +3,7 @@
 
 ## Description
 A fast and simple stream based logging library for C. The API should be mostly stable from now on. Almost all planned features of 
-scribe are now implemented, so the majority of changes to come will be bug fixes and unit tests.  The current version
-of scribe is v0.1.0.
+scribe are now implemented, so the majority of changes to come will be bug fixes and unit tests.
 
 Author: Dalton Woodard
 

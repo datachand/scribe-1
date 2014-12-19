@@ -9,19 +9,24 @@
 #ifndef SCRIBE_DEBUG_H
 #define SCRIBE_DEBUG_H
 
+#include "scribe_conf.h"
+
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#if defined(SCRIBE_WINDOWS)
+#include "Windows.h"
+#else
+#include <sys/time.h>
+#endif
 
-#include "scribe_conf.h"
 #include "scribe_metainfo.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#if SCRIBE_DEUBG
+#if SCRIBE_DEBUG
 
 extern
 struct scrb_stream * scrb_debug;

@@ -13,11 +13,6 @@
 #define likely(x) __builtin_expect((x),1)
 #define unlikely(x) __builtin_expect((x),0)
 
-#define SCRIBE_VERSION_MAJOR "0"
-#define SCRIBE_VERSION_MINOR "1"
-#define SCRIBE_VERSION_PATCH "0"
-#define SCRIBE_VERSION ""SCRIBE_VERSION_MAJOR"."SCRIBE_VERSION_MINOR"."SCRIBE_VERSION_PATCH""
-
 #if defined(NDEBUG)
 #   define SCRIBE_DEBUG 0
 #else

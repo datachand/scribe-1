@@ -138,9 +138,9 @@ int scrb_init(void)
         memcpy(scrb_stderr, &errstream, sizeof(struct scrb_stream));
 #if SCRIBE_DEBUG 
         fprintf(dbgstream.stream.filestream, 
-                "----- successful scribe init :: version (%s) :: compile date (%s %s) "
-                ":: compiled as "SCRB_LANGUAGE" by "SCRB_CC" ver. " SCRB_CC_VER " "
-                ":: pid (%d) -----\n", SCRIBE_VERSION, __DATE__, __TIME__, (int) scrb_getpid());
+                "----- successful scribe init :: compile date (%s %s) "
+                ":: compiled as " SCRB_LANGUAGE " by " SCRB_CC " ver. " SCRB_CC_VER " "
+                ":: pid (%d) -----\n", __DATE__, __TIME__, (int) scrb_getpid());
 #endif
     }
     return (SCRB_Success);

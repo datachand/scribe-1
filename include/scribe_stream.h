@@ -17,6 +17,7 @@
 #include <string.h>
 
 #include "scribe_conf.h"
+#include "scribe_loglevel.h"
 #include "scribe_return_types.h"
 #include "spinlock.h"
 
@@ -36,7 +37,7 @@ struct streaminfo {
 struct scrb_stream {
 	char const * name;
     bool const synchronize;
-    uint16_t const severity;
+    enum scrb_loglevel const severity;
     struct streaminfo stream;
     struct spinlock rwlock;
 };
@@ -48,7 +49,7 @@ char const * scrb_stream_name_internal(struct scrb_stream const * const st)
 }
 
 static inline
-uint16_t scrb_stream_severity_internal(struct scrb_stream const * const st)
+enum scrb_loglevel scrb_stream_severity_internal(struct scrb_stream const * const st)
 {
     return st->severity;
 }
@@ -57,7 +58,7 @@ extern
 struct scrb_stream * scrb_open_stream_internal(char const * const path, 
                                                 char const * const mode, 
                                                 bool const synchronize,
-                                                uint16_t const severity);
+                                                enum scrb_loglevel const severity);
 
 extern
 void scrb_close_stream_internal(struct scrb_stream ** streamptr);

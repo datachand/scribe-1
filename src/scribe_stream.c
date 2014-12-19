@@ -18,15 +18,16 @@
 #include "scribe.h"
 #include "scribe_conf.h"
 #include "scribe_debug.h"
+#include "scribe_loglevel.h"
 #include "scribe_return_types.h"
 #include "scribe_stream.h"
 #include "scribe_utils.h"
 #include "spinlock.h"
 
 struct scrb_stream * scrb_open_stream_internal(char const * const path, 
-                                                char const * const mode, 
-                                                bool const synchronize,
-                                                uint16_t const severity)
+                                               char const * const mode, 
+                                               bool const synchronize,
+                                               enum scrb_loglevel const severity)
 {
 	if (NULL == path) {
 #if SCRIBE_DEBUG

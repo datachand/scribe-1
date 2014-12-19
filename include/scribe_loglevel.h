@@ -16,29 +16,29 @@ extern "C" {
 #endif
 
 enum scrb_loglevel {
-    LVL_DEBUG  = (1 << 0),
-    LVL_TRACE  = (1 << 1),
-    LVL_INFO   = (1 << 2),
-    LVL_NOTICE = (1 << 3),
-    LVL_WARN   = (1 << 4),
-    LVL_ALERT  = (1 << 5),
-    LVL_ERROR  = (1 << 6),
-    LVL_EMERG  = (1 << 7)
+    LVL_DEBUG  = 0,
+    LVL_TRACE,
+    LVL_INFO,
+    LVL_NOTICE,
+    LVL_WARN,
+    LVL_ALERT,
+    LVL_ERROR,
+    LVL_EMERG
 };
 
 static char const * levelstrs[] = { "DEBUG", "TRACE", "INFO", "NOTICE", "WARN", "ALERT", "ERROR", "EMERG", "unknown" };
 
 static inline
-char const * scrb_getlevelstr(uint16_t const severity)
+char const * scrb_getlevelstr(enum scrb_loglevel const severity)
 {
-    return severity & LVL_DEBUG  ? levelstrs[0]
-         : severity & LVL_TRACE  ? levelstrs[1]
-         : severity & LVL_INFO   ? levelstrs[2]
-         : severity & LVL_NOTICE ? levelstrs[3]
-         : severity & LVL_WARN   ? levelstrs[4]
-         : severity & LVL_ALERT  ? levelstrs[5]
-         : severity & LVL_ERROR  ? levelstrs[6]
-         : severity & LVL_EMERG  ? levelstrs[7] : levelstrs[8];
+    return severity == LVL_DEBUG  ? levelstrs[0]
+         : severity == LVL_TRACE  ? levelstrs[1]
+         : severity == LVL_INFO   ? levelstrs[2]
+         : severity == LVL_NOTICE ? levelstrs[3]
+         : severity == LVL_WARN   ? levelstrs[4]
+         : severity == LVL_ALERT  ? levelstrs[5]
+         : severity == LVL_ERROR  ? levelstrs[6]
+         : severity == LVL_EMERG  ? levelstrs[7] : levelstrs[8];
 }
 
 #ifdef __cplusplus

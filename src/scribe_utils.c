@@ -59,7 +59,7 @@ error:
     return (SCRB_Failure);
 }
 
-char * scrb_build_msg(uint16_t const severity,
+char * scrb_build_msg(enum scrb_loglevel const severity,
                       char const * const streamname,
                       struct scrb_meta_info const mi, 
                       struct scrb_format const * const fmt, 
@@ -110,83 +110,83 @@ char * scrb_build_msg(uint16_t const severity,
             uint64_t addlen          = 0;
             bool addstring_allocated = false;
             switch (fmttypes[fmtcount++]) {
-                case (FMT_FILE):
-                {
-                    addlen     = mi.filelen;
-                    add_string = mi.file;
-                    break;
-                }
-                case (FMT_MTHD):
-                {
-                    addlen     = mi.mthdlen;
-                    add_string = mi.mthd;
-                    break;
-                }
-                case (FMT_LINE):
-                {
-                    addlen     = (uint64_t) snprintf(writebuffer, 20, "%d", mi.line);
-                    add_string = writebuffer;
-                    break;
-                }
-                case (FMT_PID):
-                {
-                    addlen     = (uint64_t) snprintf(writebuffer, 20, "%d", (int) mi.pid);
-                    add_string = writebuffer;
-                    break;
-                }
-                case (FMT_TIME):
-                {
+            case (FMT_FILE):
+            {
+                addlen     = mi.filelen;
+                add_string = mi.file;
+                break;
+            }
+            case (FMT_MTHD):
+            {
+                addlen     = mi.mthdlen;
+                add_string = mi.mthd;
+                break;
+            }
+            case (FMT_LINE):
+            {
+                addlen     = (uint64_t) snprintf(writebuffer, 20, "%d", mi.line);
+                add_string = writebuffer;
+                break;
+            }
+            case (FMT_PID):
+            {
+                addlen     = (uint64_t) snprintf(writebuffer, 20, "%d", (int) mi.pid);
+                add_string = writebuffer;
+                break;
+            }
+            case (FMT_TIME):
+            {
 #define DFLT_TIMESTR "[no time]"
-                    if (hastimehook) {
-                        char * timebuff = NULL;
-                        size_t len      = 0;
-                        fmt->timehook(&timebuff, &len, mi.ts);
-                        if (unlikely(NULL == timebuff)) {
-                            addlen     = sizeof(DFLT_TIMESTR) - 1;
-                            add_string = writebuffer;
-                            memcpy(writebuffer, DFLT_TIMESTR, addlen);
-                        } else {
-                            addlen              = len;
-                            add_string          = timebuff;
-                            addstring_allocated = true;
-                        }
-                    } else {
+                if (hastimehook) {
+                    char * timebuff = NULL;
+                    size_t len      = 0;
+                    fmt->timehook(&timebuff, &len, mi.ts);
+                    if (unlikely(NULL == timebuff)) {
                         addlen     = sizeof(DFLT_TIMESTR) - 1;
                         add_string = writebuffer;
                         memcpy(writebuffer, DFLT_TIMESTR, addlen);
+                    } else {
+                        addlen              = len;
+                        add_string          = timebuff;
+                        addstring_allocated = true;
                     }
-                    break;
+                } else {
+                    addlen     = sizeof(DFLT_TIMESTR) - 1;
+                    add_string = writebuffer;
+                    memcpy(writebuffer, DFLT_TIMESTR, addlen);
+                }
+                break;
 #undef DFLT_TIMESTR
-                }
-                case (FMT_STREAMNAME):
-                {
-                    addlen     = strlen(streamname);
-                    add_string = streamname;
-                    break;
-                }
-                case (FMT_SEVERITY):
-                {
-                    char const * const levelstr = scrb_getlevelstr(severity);
-                    addlen     = strlen(levelstr);
-                    add_string = levelstr;
-                    break;
-                }
-                case (FMT_MSG):
-                {
-                    addlen     = strlen(msg);
-                    add_string = msg;
-                    break;
-                }
-                case (FMT_PRCNT):
-                {
-                    addlen         =  1;
-                    add_string     = writebuffer;
-                    writebuffer[0] = '%';
-                    break;
-                }
-                default:
-                    break;
             }
+            case (FMT_STREAMNAME):
+            {
+                addlen     = strlen(streamname);
+                add_string = streamname;
+                break;
+            }
+            case (FMT_SEVERITY):
+            {
+                char const * const levelstr = scrb_getlevelstr(severity);
+                addlen     = strlen(levelstr);
+                add_string = levelstr;
+                break;
+            }
+            case (FMT_MSG):
+            {
+                addlen     = strlen(msg);
+                add_string = msg;
+                break;
+            }
+            case (FMT_PRCNT):
+            {
+                addlen         =  1;
+                add_string     = writebuffer;
+                writebuffer[0] = '%';
+                break;
+            }
+            default:
+                break;
+        }
             checklen(&build_string, printbuff, &build_string_allocated,
                      &build_string_cap, &writing_pos, &written_length, addlen);
             memcpy(writing_pos, add_string, addlen);
